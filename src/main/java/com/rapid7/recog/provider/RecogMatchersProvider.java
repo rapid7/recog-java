@@ -5,6 +5,7 @@ import com.rapid7.recog.RecogType;
 import com.rapid7.recog.parser.ParseException;
 import com.rapid7.recog.parser.RecogParser;
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +18,14 @@ import static java.util.Objects.requireNonNull;
  * Default provider implementation that retrieves {@link RecogMatchers} from files in a specified
  * directory on the file system.
  */
-public class RecogMatchersProvider implements IRecogMatchersProvider {
+public class RecogMatchersProvider implements IRecogMatchersProvider, Serializable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RecogMatchersProvider.class);
 
   private final Map<String, RecogMatchers> matchersByFileName;
   private final Map<String, RecogMatchers> matchersByKey;
   private final RecogType type;
-  private final RecogParser parser;
+  private final transient RecogParser parser;
 
   public RecogMatchersProvider(RecogType type, File directory) {
     this(type, directory, new RecogParser());
