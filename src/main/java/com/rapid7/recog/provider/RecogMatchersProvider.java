@@ -93,7 +93,7 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
         LOGGER.warn("Failed to open zip file {}.", path, exception);
       }
     } else {
-      LOGGER.warn("Directory {} does not exist or is not a directory; fingerprinting may be inaccurate.", path);
+      LOGGER.warn("Path {} does not exist or is not walkable; fingerprinting may be inaccurate.", path);
     }
 
     // Only count matchers loaded by file name since total matcher count will be higher than file count
