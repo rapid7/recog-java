@@ -100,6 +100,11 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
     LOGGER.info("Loaded {} fingerprint files from {}.", matchersByFileName.size(), path);
   }
 
+  /**
+   * Parse a path that represents some walkable location (zip file, directory, etc.).
+   *
+   * @param path The walkable path to parse.
+   */
   private void parseFromWalkablePath(Path path) {
     final PathMatcher filter = path.getFileSystem().getPathMatcher("glob:**/*.xml");
     try (Stream<Path> files = Files.list(path)) {
@@ -107,7 +112,8 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
         try {
           final String fileName = file.getFileName().toString();
           try (Reader reader = Files.newBufferedReader(file)) {
-            RecogMatchers matchers = parser.parse(reader, fileName.replaceAll(".xml", ""));
+            int extIndex = fileName.lastIndexOf(".xml");
+            RecogMatchers matchers = parser.parse(reader, extIndex > 0 ? fileName.substring(0, extIndex) : fileName);
             matchersByFileName.put(fileName, matchers);
             matchersByKey.put(matchers.getKey(), matchers);
           }
