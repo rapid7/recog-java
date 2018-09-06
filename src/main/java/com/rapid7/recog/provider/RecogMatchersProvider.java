@@ -5,10 +5,19 @@ import com.rapid7.recog.RecogType;
 import com.rapid7.recog.parser.ParseException;
 import com.rapid7.recog.parser.RecogParser;
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Serializable;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
@@ -17,17 +26,21 @@ import static java.util.Objects.requireNonNull;
  * Default provider implementation that retrieves {@link RecogMatchers} from files in a specified
  * directory on the file system.
  */
-public class RecogMatchersProvider implements IRecogMatchersProvider {
+public class RecogMatchersProvider implements IRecogMatchersProvider, Serializable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RecogMatchersProvider.class);
 
   private final Map<String, RecogMatchers> matchersByFileName;
   private final Map<String, RecogMatchers> matchersByKey;
   private final RecogType type;
-  private final RecogParser parser;
+  private final transient RecogParser parser;
+
+  public RecogMatchersProvider(RecogType type, Path path) {
+    this(type, path, new RecogParser());
+  }
 
   public RecogMatchersProvider(RecogType type, File directory) {
-    this(type, directory, new RecogParser());
+    this(type, directory.toPath());
   }
 
   @Override
@@ -54,37 +67,62 @@ public class RecogMatchersProvider implements IRecogMatchersProvider {
   /**
    * Constructor that allows injection of the parser, for testability.
    */
-  RecogMatchersProvider(RecogType type, File directory, RecogParser parser) {
+  RecogMatchersProvider(RecogType type, Path path, RecogParser parser) {
     this.type = requireNonNull(type);
     this.parser = requireNonNull(parser);
     matchersByFileName = new HashMap<>();
     matchersByKey = new HashMap<>();
 
-    parseFiles(requireNonNull(directory));
+    parseFiles(requireNonNull(path));
   }
 
   /**
-   * This method collects fingerprints from a given dir, using a given set of file extension
-   * supported. Currently xml.
+   * This method collects fingerprints from a given directory, file or zip, using a
+   * given set of file extension supported. Currently xml.
    *
-   * @param dir Location of the file.
+   * @param path The location of the file, directory or zip to load.
    */
-  private void parseFiles(File dir) {
-    if (dir.isDirectory()) {
-      FileUtils.listFiles(dir, new String[] {"xml"}, true).forEach(file -> {
-        try {
-          RecogMatchers matchers = parser.parse(file);
-          matchersByFileName.put(file.getName(), matchers);
-          matchersByKey.put(matchers.getKey(), matchers);
-        } catch (ParseException exception) {
-          LOGGER.warn("Failed to parse document {}.", file, exception);
-        }
-      });
+  private void parseFiles(Path path) {
+    FileSystem fileSystem = null;
+    if (Files.isDirectory(path)) {
+      parseFromWalkablePath(path);
+    } else if (Files.isRegularFile(path) && path.getFileName().toString().endsWith(".zip")) {
+      try (FileSystem fs = FileSystems.newFileSystem(path, null)) {
+        parseFromWalkablePath(fs.getRootDirectories().iterator().next());
+      } catch (IOException exception) {
+        LOGGER.warn("Failed to open zip file {}.", path, exception);
+      }
     } else {
-      LOGGER.warn("Directory {} does not exist or is not a directory; fingerprinting may be inaccurate.", dir);
+      LOGGER.warn("Path {} does not exist or is not walkable; fingerprinting may be inaccurate.", path);
     }
 
     // Only count matchers loaded by file name since total matcher count will be higher than file count
-    LOGGER.info("Loaded {} fingerprint files from {}.", matchersByFileName.size(), dir);
+    LOGGER.info("Loaded {} fingerprint files from {}.", matchersByFileName.size(), path);
+  }
+
+  /**
+   * Parse a path that represents some walkable location (zip file, directory, etc.).
+   *
+   * @param path The walkable path to parse.
+   */
+  private void parseFromWalkablePath(Path path) {
+    final PathMatcher filter = path.getFileSystem().getPathMatcher("glob:**/*.xml");
+    try (Stream<Path> files = Files.list(path)) {
+      files.filter(filter::matches).forEach(file -> {
+        try {
+          final String fileName = file.getFileName().toString();
+          try (Reader reader = Files.newBufferedReader(file)) {
+            int extIndex = fileName.lastIndexOf(".xml");
+            RecogMatchers matchers = parser.parse(reader, extIndex > 0 ? fileName.substring(0, extIndex) : fileName);
+            matchersByFileName.put(fileName, matchers);
+            matchersByKey.put(matchers.getKey(), matchers);
+          }
+        } catch (IOException | ParseException exception) {
+          LOGGER.warn("Failed to parse document {}.", file, exception);
+        }
+      });
+    } catch (IOException exception) {
+      LOGGER.warn("I/O error while attempting to list {}.", path, exception);
+    }
   }
 }

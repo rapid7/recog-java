@@ -1,5 +1,6 @@
 package com.rapid7.recog;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,7 +19,7 @@ import static java.util.Objects.requireNonNull;
  * extraction. Matching of the patterns specified is performed using a sub-sequence or "partial"
  * match. See {@link Matcher#find()} vs {@link Matcher#matches()}.
  */
-public class RecogMatcher {
+public class RecogMatcher implements Serializable {
 
   /** The regular expression pattern to match. */
   private Pattern pattern;

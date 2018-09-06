@@ -3,6 +3,8 @@ package com.rapid7.recog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -54,6 +56,9 @@ public class RecogMatchers extends ArrayList<RecogMatcher> {
     if (input == null)
       return Collections.emptyList();
     else
-      return stream().filter(matcher -> matcher.matches(input)).map(matcher -> new RecogMatch(matcher, matcher.match(input))).collect(toList());
+      return stream().map(matcher -> {
+        Map<String,String> match = matcher.match(input);
+        return match != null ? new RecogMatch(matcher, match) : null;
+      }).filter(Objects::nonNull).collect(toList());
   }
 }
