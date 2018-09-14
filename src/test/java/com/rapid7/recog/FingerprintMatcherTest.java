@@ -46,7 +46,7 @@ public class FingerprintMatcherTest {
   }
 
   @Test
-  public void matchSuceedsCaseInsensitiveFlag() {
+  public void matchSucceedsCaseInsensitiveFlag() {
     // given
     RecogMatcher matcher = new RecogMatcher(pattern("^Apache HTTPD$", CASE_INSENSITIVE));
 
@@ -106,7 +106,7 @@ public class FingerprintMatcherTest {
   }
 
   @Test
-  public void matchSuceedsNoParameters() {
+  public void matchSucceedsNoParameters() {
     // given
     RecogMatcher matcher = new RecogMatcher(pattern("^Apache HTTPD$"));
 

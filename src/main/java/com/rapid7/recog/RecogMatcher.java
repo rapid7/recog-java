@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -100,7 +100,7 @@ public class RecogMatcher implements Serializable {
 
   /**
    * Returns whether this matcher matches the specified input fingerprint value. If this method
-   * returns {@code true} {@link #matches(String)} is guaranteed to return a non-{@code null}
+   * returns {@code true} then {@link #match(String)} is guaranteed to return a non-{@code null}
    * result.
    *
    * @param input The fingerprint to test this matcher against. May be {@code null}.
@@ -118,7 +118,7 @@ public class RecogMatcher implements Serializable {
    * Returns the matched parameter names and values for the fingerprint input. If the matcher
    * matches, all values, matching positional groups, and matching named groups will be returned in
    * the result. The result is a {@link Map} of parameter name to parameter value.
-   * If this returns a non-{@code null} value, the {@link #matches(String)} is guaranted to return
+   * If this returns a non-{@code null} value, then {@link #matches(String)} is guaranteed to return
    * {@code true}.
    *
    * @param input The fingerprint to match. May be {@code null}.
@@ -220,14 +220,14 @@ public class RecogMatcher implements Serializable {
 
   @Override
   public String toString() {
-    return toStringHelper(this)
-        .add("Pattern", pattern.pattern())
-        .add("Description", description)
-        .add("Flags", pattern.flags())
-        .add("Positional Parameters", positionalParameters)
-        .add("Named Parameters", namedParameters)
-        .add("Values", values)
-        .add("Examples", examples)
+    return new StringJoiner(", ", RecogMatcher.class.getSimpleName() + "[", "]")
+        .add("Pattern=" + pattern.pattern())
+        .add("Description=" + description)
+        .add("Flags=" + pattern.flags())
+        .add("Positional Parameters=" + positionalParameters)
+        .add("Named Parameters=" + namedParameters)
+        .add("Values=" + values)
+        .add("Examples=" + examples)
         .toString();
   }
 

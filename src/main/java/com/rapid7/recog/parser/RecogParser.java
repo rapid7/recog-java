@@ -68,11 +68,12 @@ public class RecogParser {
    * Parses {@link RecogMatchers} from the XML content in the specified {@link Reader}.
    *
    * @param reader The content to read from. Must not be {@code null}.
+   * @param name Unused
    * @return {@link RecogMatchers} parsed from the reader. Will not be {@code null} but may be empty
    *         if no matchers are defined, or all matchers are invalid and strict mode is disabled.
    * @throws ParseException If an error is encountered and strict-mode is enabled.
    */
-  public RecogMatchers parse(Reader reader, String name)
+  public RecogMatchers parse(Reader reader, String name) // TODO: what was name meant to be used for?
       throws ParseException {
     Document document;
     try {

@@ -34,6 +34,7 @@ public class CompositeRecogMatchersProvider implements IRecogMatchersProvider {
    * provider has lower priority than any previously added providers.
    *
    * @param provider The provider to add. Must not be {@code null}.
+   * @return a reference to this {@link CompositeRecogMatchersProvider}
    */
   public CompositeRecogMatchersProvider addProvider(IRecogMatchersProvider provider) {
     providers.add(requireNonNull(provider));
@@ -61,7 +62,7 @@ public class CompositeRecogMatchersProvider implements IRecogMatchersProvider {
     // if there are multiple matches
     else {
       // the matchers need to be consolidated together; iterate over each list of matchers and keep
-      // only unique matcßhers by their pattern; as the providers are ordered based on priority, first one wins;
+      // only unique matchers by their pattern; as the providers are ordered based on priority, first one wins;
       // insertion order is maintained through this process
       LinkedHashMap<String, RecogMatcher> uniqueMatchers = new LinkedHashMap<>();
       matchers.forEach(potentialMatchers -> potentialMatchers.forEach(potentialMatcher -> uniqueMatchers.putIfAbsent(potentialMatcher.getPattern(), potentialMatcher)));

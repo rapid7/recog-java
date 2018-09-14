@@ -2,7 +2,7 @@ package com.rapid7.recog;
 
 import java.util.Map;
 import java.util.Set;
-import static com.google.common.base.MoreObjects.toStringHelper;
+import java.util.StringJoiner;
 import static java.util.Objects.requireNonNull;
 
 public class RecogMatchResult {
@@ -61,15 +61,15 @@ public class RecogMatchResult {
 
   @Override
   public String toString() {
-    return toStringHelper(this)
-      .add("Key", key)
-      .add("Type", type)
-      .add("Protocol", protocol)
-      .add("Preference", preference)
-      .add("Description", description)
-      .add("Pattern", pattern)
-      .add("Examples", examples)
-      .add("Matches", matches)
-      .toString();
+    return new StringJoiner(", ", RecogMatchResult.class.getSimpleName() + "[", "]")
+        .add("Key=" + key )
+        .add("Type=" + type)
+        .add("Protocol=" + protocol)
+        .add("Preference=" + preference)
+        .add("Description=" + description)
+        .add("Pattern=" + pattern)
+        .add("Examples=" + examples)
+        .add("Matches=" + matches)
+        .toString();
   }
 }
