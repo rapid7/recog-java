@@ -9,6 +9,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 
 public class FingerprintMatchersTest {
@@ -106,5 +108,94 @@ public class FingerprintMatchersTest {
     assertThat(matches, hasSize(2));
     assertThat(matches.get(0).getParameters().entrySet(), containsInAnyOrder(new SimpleEntry<>("version", "8.3")));
     assertThat(matches.get(1).getParameters().entrySet(), containsInAnyOrder(new SimpleEntry<>("major.version", "8"), new SimpleEntry<>("minor.version", "3")));
+  }
+
+  @Test
+  public void matchesReturnsValidCPE() {
+    // given
+    String fingerprint = "Apache/2.2.3";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache$")));
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")).addParam(1, "service.version").addValue("service.cpe23", "cpe:/a:apache:http_server:{service.version}"));
+
+    // when
+    List<RecogMatch> matches = matchers.getMatches(fingerprint);
+
+    // then
+    assertThat(matches, hasSize(1));
+    assertThat(matches.get(0).getParameters().get("service.cpe23"), is("cpe:/a:apache:http_server:2.2.3"));
+  }
+
+  @Test
+  public void firstMatchMatches() {
+    // given
+    String fingerprint = "Apache/2.2.3";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache$")));
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match, is(notNullValue()));
+  }
+
+  @Test
+  public void firstMatchDoesNotMatch() {
+    // given
+    String fingerprint = "foo";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache$")));
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match, is(nullValue()));
+  }
+
+  @Test
+  public void firstMatchReturnsValidCPE() {
+    // given
+    String fingerprint = "Apache/2.2.3";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache$")));
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")).addParam(1, "service.version").addValue("service.cpe23", "cpe:/a:apache:http_server:{service.version}"));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match.getParameters().get("service.cpe23"), is("cpe:/a:apache:http_server:2.2.3"));
+  }
+
+  @Test
+  public void multipleInterpolatedValuesCPE() {
+    // given
+    String fingerprint = "asdfbar";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("(asdf)(bar)")).addParam(1, "first").addParam(2, "second").addValue("cpe.cpe23", "cpe:/a:test:{first}:{second}"));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match.getParameters().get("cpe.cpe23"), is("cpe:/a:test:asdf:bar"));
+  }
+
+  @Test
+  public void interpolationMissingFieldCausesDash() {
+    // given
+    String fingerprint = "Apache";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")).addParam(1, "service.version").addValue("service.cpe23", "cpe:/a:apache:http_server:{service.version}"));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match.getParameters().get("service.cpe23"), is("cpe:/a:apache:http_server:-"));
   }
 }
