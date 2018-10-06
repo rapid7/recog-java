@@ -201,6 +201,20 @@ public class FingerprintMatchersTest {
   }
 
   @Test
+  public void multipleOfTheSameInterpolationProperty() {
+    // given
+    String fingerprint = "Apache/2.2.3";
+    RecogMatchers matchers = new RecogMatchers();
+    matchers.add(new RecogMatcher(pattern("^Apache(?:-AdvancedExtranetServer)?(?:/([012][\\d.]*)\\s*(.*))?$")).addParam(1, "service.version").addValue("service.cpe23", "cpe:/a:apache:http_server:{service.version}:{service.version}"));
+
+    // when
+    RecogMatch match = matchers.getFirstMatch(fingerprint);
+
+    // then
+    assertThat(match.getParameters().get("service.cpe23"), is("cpe:/a:apache:http_server:2.2.3:2.2.3"));
+  }
+
+  @Test
   public void interpolateWithNullSuffix() {
     // given
     RecogMatchers matchers = new RecogMatchers();
