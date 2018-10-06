@@ -1,5 +1,6 @@
 package com.rapid7.recog;
 
+import java.util.HashMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -197,5 +198,37 @@ public class FingerprintMatchersTest {
 
     // then
     assertThat(match.getParameters().get("service.cpe23"), is("cpe:/a:apache:http_server:-"));
+  }
+
+  @Test
+  public void interpolateWithNullSuffix() {
+    // given
+    RecogMatchers matchers = new RecogMatchers();
+    HashMap<String, String> map = new HashMap<>();
+    map.put("foo", "test");
+    map.put("bar", "{foo}");
+
+    // when
+    matchers.interpolate(null, map);
+
+    // then
+    assertThat(map.get("bar"), is("test"));
+    assertThat(map.get("foo"), is("test"));
+  }
+
+  @Test
+  public void interpolateWithNonNullSuffix() {
+    // given
+    RecogMatchers matchers = new RecogMatchers();
+    HashMap<String, String> map = new HashMap<>();
+    map.put("foo", "test");
+    map.put("bar", "{foo}");
+
+    // when
+    matchers.interpolate("bar", map);
+
+    // then
+    assertThat(map.get("bar"), is("test"));
+    assertThat(map.get("foo"), is("test"));
   }
 }

@@ -74,9 +74,12 @@ public class RecogMatchers extends ArrayList<RecogMatcher> {
 
     for (Map.Entry<String, String> entry : match.entrySet()) {
       // For all keys that end with a certain extension (for optimization)...
-      if (entry.getKey().endsWith(keyEndsWith)) {
+      if (keyEndsWith == null || entry.getKey().endsWith(keyEndsWith)) {
         String value = entry.getValue();
         if (value != null) {
+          // The operation below is a "fold left" -- basically iterate over
+          // all the items in the map, and attempt to replace the items in
+          // this string with those map items.
           String result =
               match.entrySet().stream()
                 .reduce(
