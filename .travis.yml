@@ -16,7 +16,7 @@ script:
 jobs:
   include:
     - stage: deploy
-      if: branch = master
+      if: branch = master AND type != pull_request AND fork = false
       jdk: oraclejdk8
       deploy:
         -
