@@ -1,5 +1,7 @@
 ## Recog Java
 
+[![Travis (.org)](https://img.shields.io/travis/rapid7/recog-java.svg)](https://travis-ci.org/rapid7/recog-java) [![Maven Central](https://img.shields.io/maven-central/v/com.rapid7.recog/recog-java.svg)](https://search.maven.org/artifact/com.rapid7.recog/recog-java)
+
 Java implementation of [Recog](https://github.com/rapid7/recog) that supports parsing and matching.
 
 #### Recog Content
