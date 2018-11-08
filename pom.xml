@@ -45,7 +45,7 @@
   </distributionManagement>
 
   <properties>
-    <r7.recog.content.version>2.1.19</r7.recog.content.version>
+    <r7.recog.content.version>2.1.32</r7.recog.content.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -213,6 +213,7 @@
         <executions>
           <execution>
             <id>checkstyle</id>
+            <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>
@@ -259,7 +260,7 @@
             <id>recog-download</id>
             <phase>pre-integration-test</phase>
             <configuration>
-              <tasks>
+              <target>
                 <mkdir dir="${project.build.directory}/recog"/>
                 <get src="http://production.cf.rubygems.org/gems/recog-${r7.recog.content.version}.gem" dest="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" usetimestamp="true"/>
                 <untar src="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" dest="${project.build.directory}/recog"/>
@@ -269,7 +270,7 @@
                   </patternset>
                   <mapper type="flatten"/>
                 </untar>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
