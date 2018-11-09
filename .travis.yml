@@ -15,7 +15,8 @@ script:
 jobs:
   include:
     - stage: deploy
-      if: branch = master AND type != pull_request AND fork = false
+      if: branch =~ /^(?:master|\d+\.\d+(\.\d+)?(-\S*)?)$/ AND type != pull_request AND fork = false
+      script: skip
       jdk: oraclejdk8
       deploy:
         -
