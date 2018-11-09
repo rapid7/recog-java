@@ -16,7 +16,7 @@ Add the dependency to your pom file:
 <dependency>
   <groupId>com.rapid7.recog</groupId>
   <artifactId>recog-java</artifactId>
-  <version>0.1.0</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 
@@ -57,6 +57,16 @@ RecogClient recog = new RecogClient(new File("path/to/recog/xml/"));
 List<RecogMatchResult> matchResults = recog.fingerprint("Apache HTTPD 6.5");
 // draw the rest of the owl...
 ```
+
+## Differences from Ruby implementation
+
+This library is not yet at a 1:1 parity with the original [rapid7/recog](https://github.com/rapid7/recog) Ruby implementation.
+
+Missing features:
+
+- Matching against multi-line input strings
+- Matching against base64 encoded strings
+- Command line tools like `recog_match` and `recog_verify`
 
 ## Development
 
