@@ -3,11 +3,6 @@ jdk:
   - openjdk8
   - openjdk11
   - openjdk-ea
-matrix:
-  allow_failures:
-    - jdk: openjdk11
-    - jdk: openjdk-ea
-  fast_finish: true
 install: true
 before_install:
   - if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
@@ -15,6 +10,10 @@ before_install:
 script:
   - mvn integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 jobs:
+  allow_failures:
+    - jdk: openjdk11
+    - jdk: openjdk-ea
+  fast_finish: true
   include:
     - stage: deploy
       if: branch =~ /^(?:master|\d+\.\d+(\.\d+)?(-\S*)?)$/ AND type != pull_request AND fork = false
