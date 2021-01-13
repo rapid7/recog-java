@@ -97,7 +97,10 @@ public class RecogParser {
       // ignore - use default
     }
 
-    RecogMatchers matchers = new RecogMatchers(root.getAttribute("matches"), root.getAttribute("protocol"), root.getAttribute("database_type"), preference);
+    String recogKey = root.getAttribute("matches");
+    recogKey = recogKey.isEmpty() ? name : recogKey;
+
+    RecogMatchers matchers = new RecogMatchers(recogKey, root.getAttribute("protocol"), root.getAttribute("database_type"), preference);
 
     NodeList fingerprints = root.getElementsByTagName("fingerprint");
     for (int index = 0; index < fingerprints.getLength(); index++) {
