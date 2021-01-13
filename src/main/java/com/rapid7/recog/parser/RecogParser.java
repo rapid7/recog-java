@@ -98,7 +98,12 @@ public class RecogParser {
     }
 
     String recogKey = root.getAttribute("matches");
-    recogKey = recogKey.isEmpty() ? name : recogKey;
+
+    if (recogKey.isEmpty() || recogKey == null)
+    {
+       LOGGER.warn("Recog Matcher Key is Empty or Null. File Name: " + name);
+       recogKey = name;
+    }
 
     RecogMatchers matchers = new RecogMatchers(recogKey, root.getAttribute("protocol"), root.getAttribute("database_type"), preference);
 
