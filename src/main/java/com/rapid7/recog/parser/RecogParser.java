@@ -73,7 +73,7 @@ public class RecogParser {
    *         if no matchers are defined, or all matchers are invalid and strict mode is disabled.
    * @throws ParseException If an error is encountered and strict-mode is enabled.
    */
-  public RecogMatchers parse(Reader reader, String name) // TODO: what was name meant to be used for?
+  public RecogMatchers parse(Reader reader, String name)
       throws ParseException {
     Document document;
     try {
@@ -99,9 +99,8 @@ public class RecogParser {
 
     String recogKey = root.getAttribute("matches");
 
-    if (recogKey.isEmpty() || recogKey == null)
-    {
-       LOGGER.warn("Recog Matcher Key is Empty or Null. File Name: " + name);
+    if (recogKey.isEmpty() || recogKey == null) {
+       LOGGER.debug("Recog Matcher Key is Empty or Null. File Name: " + name);
        recogKey = name;
     }
 
