@@ -2,6 +2,8 @@ package com.rapid7.recog.parser;
 
 import com.rapid7.recog.RecogMatcher;
 import com.rapid7.recog.RecogMatchers;
+import com.rapid7.recog.pattern.JavaRegexRecogPatternMatcher;
+import com.rapid7.recog.pattern.RecogPatternMatcher;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,8 +29,24 @@ import org.xml.sax.SAXException;
  */
 public class RecogParser {
 
+  /**
+   * Factory used to create the underlying {@link RecogPatternMatcher} used
+   * when matching inputs against regular expressions.
+   */
+  interface PatternMatcherFactory {
+    RecogPatternMatcher create(String pattern, int flags);
+  }
+
+  /**
+   * The default {@link PatternMatcherFactory} uses java.regex.* packages to evaluate
+   * regular expressions.
+   */
+  public static final PatternMatcherFactory DEFAULT_PATTERN_MATCHER_FACTORY =
+      (pattern, flags) -> new JavaRegexRecogPatternMatcher(Pattern.compile(pattern, flags));
+
   private static final Logger LOGGER = LoggerFactory.getLogger(RecogParser.class);
   private final boolean strictMode;
+  private final PatternMatcherFactory patternMatcherFactory;
 
   /**
    * Constructs a parser to parser with non-strict (lenient) parsing mode.
@@ -44,7 +62,19 @@ public class RecogParser {
    *        encountered, {@code false} otherwise.
    */
   public RecogParser(boolean strictMode) {
+    this(strictMode, DEFAULT_PATTERN_MATCHER_FACTORY);
+  }
+
+  /**
+   * Constructs a parser with the specified strictness mode and {@link PatternMatcherFactory}.
+   *
+   * @param strictMode {@code true} if the parser should throw exceptions when any error is
+   *        encountered, {@code false} otherwise.
+   * @param patternMatcherFactory The {@link PatternMatcherFactory} to be used during parsing.
+   */
+  public RecogParser(boolean strictMode, PatternMatcherFactory patternMatcherFactory) {
     this.strictMode = strictMode;
+    this.patternMatcherFactory = patternMatcherFactory;
   }
 
   /**
@@ -117,7 +147,7 @@ public class RecogParser {
         int regexFlags = parseFlags(fingerprint.getAttribute("flags"));
 
         // construct a pattern
-        RecogMatcher fingerprintPattern = new RecogMatcher(Pattern.compile(pattern, regexFlags));
+        RecogMatcher fingerprintPattern = new RecogMatcher(patternMatcherFactory.create(pattern, regexFlags));
 
         // description (optional)
         NodeList description = fingerprint.getElementsByTagName("description");
