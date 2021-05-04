@@ -33,7 +33,7 @@ public class RecogParser {
    * Factory used to create the underlying {@link RecogPatternMatcher} used
    * when matching inputs against regular expressions.
    */
-  interface PatternMatcherFactory {
+  public interface PatternMatcherFactory {
     RecogPatternMatcher create(String pattern, int flags);
   }
 
