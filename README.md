@@ -58,6 +58,22 @@ List<RecogMatchResult> matchResults = recog.fingerprint("Apache HTTPD 6.5");
 // draw the rest of the owl...
 ```
 
+#### Configuring Pattern Matching
+
+By default, recog-java uses Java's standard regular expression package, `java.util.regex`. To use a different implementation, users can implement their own `RecogPatternMatcher` instance:
+
+```java
+import com.rapid7.recog.pattern.RecogPatternMatcher;
+
+public class CustomPatternMatcher implements RecogPatternMatcher {
+  // custom implementation...
+}
+
+RecogPatternMatcher patternMatcher = new CustomPatternMatcher("^Apache HTTPD (?<version>.*)$");
+RecogMatcher matcher = new RecogMatcher(patternMatcher);
+Map<String, String> results = matcher.match("Apache HTTPD 6.5");
+```
+
 ## Differences from Ruby implementation
 
 This library is not yet at a 1:1 parity with the original [rapid7/recog](https://github.com/rapid7/recog) Ruby implementation.
