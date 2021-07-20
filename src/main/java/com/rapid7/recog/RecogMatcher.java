@@ -1,5 +1,8 @@
 package com.rapid7.recog;
 
+import com.rapid7.recog.pattern.JavaRegexRecogPatternMatcher;
+import com.rapid7.recog.pattern.RecogPatternMatchResult;
+import com.rapid7.recog.pattern.RecogPatternMatcher;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,8 +24,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class RecogMatcher implements Serializable {
 
-  /** The regular expression pattern to match. */
-  private Pattern pattern;
+  private final RecogPatternMatcher matcher;
 
   /** "Constant" values always matched as parameters. Key is the name, value is the value. */
   private Map<String, String> values;
@@ -45,8 +47,23 @@ public class RecogMatcher implements Serializable {
   /** Optional examples that illustrate the matcher (or that can be used to test the matcher). */
   private Set<String> examples;
 
+  /**
+   * Creates a new RecogMatcher using a {@link JavaRegexRecogPatternMatcher} to
+   * match fingerprint values.
+   *
+   * @param pattern The regular expression pattern to match fingerprint values against.
+   */
   public RecogMatcher(Pattern pattern) {
-    this.pattern = requireNonNull(pattern);
+    this(new JavaRegexRecogPatternMatcher(pattern));
+  }
+
+  /**
+   * Creates a RecogMatcher with the specified {@link RecogPatternMatcher}.
+   *
+   * @param matcher The {@link RecogPatternMatcher} to use when matching fingerprint values.
+   */
+  public RecogMatcher(RecogPatternMatcher matcher) {
+    this.matcher = matcher;
     values = new HashMap<>();
     positionalParameters = new HashMap<>();
     namedParameters = new HashSet<>();
@@ -111,7 +128,7 @@ public class RecogMatcher implements Serializable {
     if (input == null)
       return false;
     else
-      return pattern.matcher(input).find();
+      return matcher.matches(input);
   }
 
   /**
@@ -129,19 +146,19 @@ public class RecogMatcher implements Serializable {
     if (input == null)
       return null;
 
-    Matcher matcher = pattern.matcher(input);
-    if (matcher.find()) {
+    RecogPatternMatchResult result = matcher.match(input);
+    if (result != null) {
       Map<String, String> values = new HashMap<>();
       values.putAll(this.values);
 
       // parse positional parameters for the groups specified
       for (Entry<String, Integer> parameter : positionalParameters.entrySet())
-        if (parameter.getValue() <= matcher.groupCount())
-          values.put(parameter.getKey(), matcher.group(parameter.getValue()));
+        if (parameter.getValue() <= result.groupCount())
+          values.put(parameter.getKey(), result.group(parameter.getValue()));
 
       for (String parameter : namedParameters) {
         try {
-          values.put(parameter, matcher.group(parameter));
+          values.put(parameter, result.group(parameter));
         } catch (IllegalArgumentException exception) {
           // the group with the name doesn't exist, ignore it
         }
@@ -199,7 +216,7 @@ public class RecogMatcher implements Serializable {
   }
 
   public String getPattern() {
-    return pattern.pattern();
+    return matcher.getPattern();
   }
 
   /**
@@ -221,9 +238,9 @@ public class RecogMatcher implements Serializable {
   @Override
   public String toString() {
     return new StringJoiner(", ", RecogMatcher.class.getSimpleName() + "[", "]")
-        .add("Pattern=" + pattern.pattern())
+        .add("Pattern=" + matcher.getPattern())
         .add("Description=" + description)
-        .add("Flags=" + pattern.flags())
+        .add("Flags=" + matcher.getFlags())
         .add("Positional Parameters=" + positionalParameters)
         .add("Named Parameters=" + namedParameters)
         .add("Values=" + values)
@@ -233,7 +250,7 @@ public class RecogMatcher implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(pattern, values, positionalParameters);
+    return Objects.hash(matcher, values, positionalParameters);
   }
 
   @Override
@@ -244,8 +261,7 @@ public class RecogMatcher implements Serializable {
       return false;
     else {
       RecogMatcher other = (RecogMatcher) obj;
-      return Objects.equals(pattern.flags(), other.pattern.flags())
-          && Objects.equals(pattern.pattern(), other.pattern.pattern())
+      return Objects.equals(matcher, other.matcher)
           && Objects.equals(values, other.values)
           && Objects.equals(positionalParameters, other.positionalParameters)
           && Objects.equals(namedParameters, other.namedParameters);
