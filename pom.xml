@@ -4,7 +4,7 @@
 
   <groupId>com.rapid7.recog</groupId>
   <artifactId>recog-java</artifactId>
-  <version>0.7.1-SNAPSHOT</version>
+  <version>0.7.1</version>
   <packaging>jar</packaging>
   <name>recog-java</name>
   <url>https://www.rapid7.com</url>
@@ -14,7 +14,7 @@
     <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
     <developerConnection>scm:git:git@github.com:rapid7/recog-java.git</developerConnection>
     <url>https://github.com/rapid7/recog-java</url>
-    <tag>HEAD</tag>
+    <tag>recog-java-0.7.1</tag>
   </scm>
 
   <developers>
@@ -207,14 +207,14 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/recog"/>
-                <get src="http://production.cf.rubygems.org/gems/recog-${r7.recog.content.version}.gem" dest="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" usetimestamp="true"/>
-                <untar src="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" dest="${project.build.directory}/recog"/>
+                <mkdir dir="${project.build.directory}/recog" />
+                <get src="http://production.cf.rubygems.org/gems/recog-${r7.recog.content.version}.gem" dest="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" usetimestamp="true" />
+                <untar src="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" dest="${project.build.directory}/recog" />
                 <untar compression="gzip" src="${project.build.directory}/recog/data.tar.gz" dest="${project.build.directory}/test-classes/com/rapid7/recog/fingerprints">
                   <patternset>
-                    <include name="xml/*.xml"/>
+                    <include name="xml/*.xml" />
                   </patternset>
-                  <mapper type="flatten"/>
+                  <mapper type="flatten" />
                 </untar>
               </target>
             </configuration>
