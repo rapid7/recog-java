@@ -43,17 +43,17 @@ public class FingerprintMatcherParserTest {
   public void validFingerprint() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"REG_DOT_NEWLINE,REG_MULTILINE\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache 1</example>\n"
-        + "       <example>Apache 2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "       <param pos=\"1\" name=\"service.version\"/>\n"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"REG_DOT_NEWLINE,REG_MULTILINE\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache 1</example>\n"
+            + "       <example>Apache 2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "       <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -67,24 +67,24 @@ public class FingerprintMatcherParserTest {
   public void twoValidFingerprints() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache/1</example>\n"
-        + "       <example>Apache/2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "    </fingerprint>\n"
-        + "    <fingerprint pattern=\"^Apache$\" flags=\"REG_MULTILINE\">\n"
-        + "        <description>Apache returning no version information</description>\n"
-        + "        <example>Apache</example>\n"
-        + "        <example>apache</example>\n"
-        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "    </fingerprint>"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache/1</example>\n"
+            + "       <example>Apache/2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "    </fingerprint>\n"
+            + "    <fingerprint pattern=\"^Apache$\" flags=\"REG_MULTILINE\">\n"
+            + "        <description>Apache returning no version information</description>\n"
+            + "        <example>Apache</example>\n"
+            + "        <example>apache</example>\n"
+            + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "    </fingerprint>"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -92,37 +92,37 @@ public class FingerprintMatcherParserTest {
     // then
     assertThat(patterns.size(), is(2));
     assertThat(patterns, hasItems(
-        new RecogMatcher(pattern("^Apache/\\d$", CASE_INSENSITIVE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache"),
-        new RecogMatcher(pattern("^Apache$", MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
+            new RecogMatcher(pattern("^Apache/\\d$", CASE_INSENSITIVE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache"),
+            new RecogMatcher(pattern("^Apache$", MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
   }
 
   @Test
   public void invalidFingerprintsIgnored() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
-        + "        <description>Apache returning only its major version number</description>\n"
-        + "        <example>Apache/1</example>\n"
-        + "        <example>Apache/2</example>\n"
-        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "   </fingerprint>\n"
-        + "   <broken_fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
-        + "      <description>Apache returning only its major version number</description>\n"
-        + "      <example>Apache/1</example>\n"
-        + "      <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "   </broken_fingerprint>\n"
-        + "   <fingerprint pattern=\"^Apache$\" flags=\"REG_ICASE\">\n"
-        + "       <description>Apache returning no version information</description>\n"
-        + "       <example>Apache</example>\n"
-        + "       <example>apache</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "    </fingerprint>"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
+            + "        <description>Apache returning only its major version number</description>\n"
+            + "        <example>Apache/1</example>\n"
+            + "        <example>Apache/2</example>\n"
+            + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "   </fingerprint>\n"
+            + "   <broken_fingerprint pattern=\"^Apache/\\d$\" flags=\"REG_ICASE\">\n"
+            + "      <description>Apache returning only its major version number</description>\n"
+            + "      <example>Apache/1</example>\n"
+            + "      <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "   </broken_fingerprint>\n"
+            + "   <fingerprint pattern=\"^Apache$\" flags=\"REG_ICASE\">\n"
+            + "       <description>Apache returning no version information</description>\n"
+            + "       <example>Apache</example>\n"
+            + "       <example>apache</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "    </fingerprint>"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -135,17 +135,17 @@ public class FingerprintMatcherParserTest {
   public void patternIsRequired() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint flags=\"REG_DOT_NEWLINE\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache 1</example>\n"
-        + "       <example>Apache 2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "       <param pos=\"1\" name=\"service.version\"/>\n"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint flags=\"REG_DOT_NEWLINE\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache 1</example>\n"
+            + "       <example>Apache 2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "       <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -158,17 +158,17 @@ public class FingerprintMatcherParserTest {
   public void patternMustBeValid() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache(/\\d$\" flags=\"REG_DOT_NEWLINE\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache 1</example>\n"
-        + "       <example>Apache 2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "       <param pos=\"1\" name=\"service.version\"/>\n"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache(/\\d$\" flags=\"REG_DOT_NEWLINE\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache 1</example>\n"
+            + "       <example>Apache 2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "       <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -181,17 +181,17 @@ public class FingerprintMatcherParserTest {
   public void emptyFlagsIgnored() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache 1</example>\n"
-        + "       <example>Apache 2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "       <param pos=\"1\" name=\"service.version\"/>\n"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache 1</example>\n"
+            + "       <example>Apache 2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "       <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
@@ -205,17 +205,17 @@ public class FingerprintMatcherParserTest {
   public void unknownFlagIgnored() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"http_header.server\">"
-        + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"foo\">\n"
-        + "       <description>Apache returning only its major version number</description>\n"
-        + "       <example>Apache 1</example>\n"
-        + "       <example>Apache 2</example>\n"
-        + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
-        + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
-        + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
-        + "       <param pos=\"1\" name=\"service.version\"/>\n"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
+            + "<fingerprints matches=\"http_header.server\">"
+            + "   <fingerprint pattern=\"^Apache (\\d)$\" flags=\"foo\">\n"
+            + "       <description>Apache returning only its major version number</description>\n"
+            + "       <example>Apache 1</example>\n"
+            + "       <example>Apache 2</example>\n"
+            + "       <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "       <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "       <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "       <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
 
     // when
     RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
