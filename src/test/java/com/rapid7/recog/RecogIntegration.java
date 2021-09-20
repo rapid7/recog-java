@@ -30,9 +30,9 @@ public class RecogIntegration {
       RecogMatchers matchers = parser.parse(file);
       for (RecogMatcher matcher : matchers) {
         // when - the matcher has examples
-        for (String example : matcher.getExamples())
+        for (FingerprintExample example : matcher.getExamples())
           // then - the example matches
-          assertThat("Matcher in " + file + " with pattern '" + matcher.getPattern() + "' does not match example '" + example + "'.", matcher.matches(example), is(true));
+          assertThat("Matcher in " + file + " with pattern '" + matcher.getPattern() + "' does not match example '" + example.getText() + "'.", matcher.matches(example.getText()), is(true));
       }
     }
   }

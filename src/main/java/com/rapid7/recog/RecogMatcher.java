@@ -45,7 +45,7 @@ public class RecogMatcher implements Serializable {
   private String description;
 
   /** Optional examples that illustrate the matcher (or that can be used to test the matcher). */
-  private Set<String> examples;
+  private Set<FingerprintExample> examples;
 
   /**
    * Creates a new RecogMatcher using a {@link JavaRegexRecogPatternMatcher} to
@@ -98,9 +98,10 @@ public class RecogMatcher implements Serializable {
    *        {@code null}.
    * @return A reference to this matcher to allow for method chaining.
    */
-  public RecogMatcher addExample(String example) {
-    if (example != null)
+  public RecogMatcher addExample(FingerprintExample example) {
+    if (example != null) {
       examples.add(example);
+    }
 
     return this;
   }
@@ -111,7 +112,7 @@ public class RecogMatcher implements Serializable {
    *
    * @return A non-null, immutable {@link Set} of examples. May be empty.
    */
-  public Set<String> getExamples() {
+  public Set<FingerprintExample> getExamples() {
     return examples == null ? emptySet() : unmodifiableSet(examples);
   }
 
