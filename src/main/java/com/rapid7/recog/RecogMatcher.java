@@ -3,6 +3,7 @@ package com.rapid7.recog;
 import com.rapid7.recog.pattern.JavaRegexRecogPatternMatcher;
 import com.rapid7.recog.pattern.RecogPatternMatchResult;
 import com.rapid7.recog.pattern.RecogPatternMatcher;
+import com.rapid7.recog.verify.Status;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static java.util.Collections.emptySet;
@@ -168,6 +170,76 @@ public class RecogMatcher implements Serializable {
       return values;
     } else
       return null;
+  }
+
+  public void verifyExamples(BiConsumer<Status, String> consumer) {
+    // look for the presence of test cases
+    if (examples.size() == 0) {
+      consumer.accept(Status.Warn, String.format("'%s' has no test cases", description));
+    }
+
+    // make sure each test case passes
+    for (FingerprintExample example : examples) {
+      Map<String, String> result = match(example.getText());
+      if (result == null || result.isEmpty()) {
+        consumer.accept(Status.Fail, String.format("'%s' failed to match \"%s\" with '%s'",
+                description, example.getText(), matcher.getPattern()));
+        continue;
+      }
+
+      Status status = Status.Success;
+      String message = example.getText();
+      // Ensure that all the attributes as provided by the example were parsed
+      // out correctly and match the capture group values we expect.
+      for (Map.Entry<String, String> entry : example.getAttributeMap().entrySet()) {
+        String key = entry.getKey();
+        String value = entry.getValue();
+        if (key.equals("_encoding")) {
+          continue;
+        }
+
+        if (!result.containsKey(key) || !result.get(key).equals(value)) {
+          status = Status.Fail;
+          message = String.format("'%s' failed to find expected capture group %s '%s'. Result was %s",
+                  description, key, value, result.get(key));
+          break;
+        }
+      }
+      consumer.accept(status, message);
+    }
+
+    verifyExamplesHaveCaptureGroups(consumer);
+  }
+
+  private void verifyExamplesHaveCaptureGroups(BiConsumer<Status, String> consumer) {
+    Map<String, Boolean> captureGroupUsed = new HashMap<>();
+    // get a list of parameters that are defined by capture groups
+    for (Entry<String, Integer> parameter : positionalParameters.entrySet()) {
+      if (parameter.getValue() > 0 && !parameter.getKey().isEmpty()) {
+        captureGroupUsed.put(parameter.getKey(), false);
+      }
+    }
+
+    // match up the fingerprint parameters with test attributes
+    for (FingerprintExample example : examples) {
+      Map<String, String> result = match(example.getText());
+      for (Entry<String, String> entry : example.getAttributeMap().entrySet()) {
+        String key = entry.getKey();
+        if (captureGroupUsed.containsKey(key)) {
+          captureGroupUsed.replace(key, true);
+        }
+      }
+    }
+
+    // alert on untested parameters
+    for (Entry<String, Boolean> entry : captureGroupUsed.entrySet()) {
+      String paramName = entry.getKey();
+      Boolean paramUsed = entry.getValue();
+      if (!paramUsed) {
+        String message = String.format("'%s' is missing an example that checks for parameter '%s' which is derived from a capture group", description, paramName);
+        consumer.accept(Status.Warn, message);
+      }
+    }
   }
 
   /**
