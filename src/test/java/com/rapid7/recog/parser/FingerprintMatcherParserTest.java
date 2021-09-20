@@ -12,6 +12,7 @@ import static java.util.regex.Pattern.MULTILINE;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FingerprintMatcherParserTest {
@@ -223,5 +224,59 @@ public class FingerprintMatcherParserTest {
     // then
     assertThat(patterns.size(), is(1));
     assertThat(patterns, hasItems(new RecogMatcher(pattern("^Apache (\\d)$")).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache").addParam(1, "service.version")));
+  }
+
+  @Test
+  public void paramZeroPositionWithNoValueFailsWhenStrict() {
+    // given
+    String xml = "<?xml version=\"1.0\"?>\n"
+            + "<fingerprints matches=\"http_header.server\">"
+            + "    <fingerprint pattern=\"^Apache (\\d)$\" flags=\"foo\">\n"
+            + "        <description>Apache returning only its major version number</description>\n"
+            + "        <example>Apache 1</example>\n"
+            + "        <example>Apache 2</example>\n"
+            + "        <param pos=\"0\" name=\"service.vendor\" value=\"\"/>\n"
+            + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "        <param pos=\"1\" name=\"service.version\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>";
+    String expectedMessage = "Attribute \"value\" does not exist.";
+
+    // when
+    Exception exception = assertThrows(ParseException.class, () -> {
+      new RecogParser(true).parse(new StringReader(xml), anyString());
+    }, expectedMessage);
+
+    // then
+    assertEquals(expectedMessage, exception.getMessage());
+  }
+
+  @Test
+  public void paramNonZeroPositionWithValueFailsWhenStrict() {
+    // given
+    String paramName = "service.version";
+    String paramValue = "1";
+    String xml = String.format("<?xml version=\"1.0\"?>\n"
+            + "<fingerprints matches=\"http_header.server\">"
+            + "    <fingerprint pattern=\"^Apache (\\d)$\" flags=\"foo\">\n"
+            + "        <description>Apache returning only its major version number</description>\n"
+            + "        <example>Apache 1</example>\n"
+            + "        <example>Apache 2</example>\n"
+            + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+            + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+            + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+            + "        <param pos=\"1\" name=\"%s\" value=\"%s\"/>\n"
+            + "    </fingerprint>\n"
+            + "</fingerprints>", paramName, paramValue);
+    String expectedMessage = String.format("Attribute \"%s\" has a non-zero position but specifies a value of \"%s\"", paramName, paramValue);
+
+    // when
+    Exception exception = assertThrows(ParseException.class, () -> {
+      new RecogParser(true).parse(new StringReader(xml), anyString());
+    }, expectedMessage);
+
+    // then
+    assertEquals(expectedMessage, exception.getMessage());
   }
 }

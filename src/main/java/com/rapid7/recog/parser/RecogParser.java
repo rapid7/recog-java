@@ -193,9 +193,12 @@ public class RecogParser {
           if (position == 0) {
             String paramValue = getRequiredAttribute(parameter, "value");
             fingerprintPattern.addValue(paramName, paramValue);
-          }
-          // otherwise the position indicates a group match result
-          else {
+          } else {
+            // otherwise the position indicates a group match result
+            String value = parameter.getAttribute("value");
+            if (!value.isEmpty()) {
+              throw new ParseException(String.format("Attribute \"%s\" has a non-zero position but specifies a value of \"%s\"", paramName, value));
+            }
             fingerprintPattern.addParam(position, paramName);
           }
         }
