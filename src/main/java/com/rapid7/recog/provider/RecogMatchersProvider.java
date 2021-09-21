@@ -86,7 +86,7 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
     if (Files.isDirectory(path)) {
       parseFromWalkablePath(path);
     } else if (Files.isRegularFile(path) && path.getFileName().toString().endsWith(".zip")) {
-      try (FileSystem fs = FileSystems.newFileSystem(path, null)) {
+      try (FileSystem fs = FileSystems.newFileSystem(path, (java.lang.ClassLoader)null)) {
         parseFromWalkablePath(fs.getRootDirectories().iterator().next());
       } catch (IOException exception) {
         LOGGER.warn("Failed to open zip file {}.", path, exception);
