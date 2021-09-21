@@ -82,6 +82,7 @@ public class RecogVerifier {
     options.addOption(new Option("c", "color", false, "Enable color in the output."));
     options.addOption(new Option(null, "warnings", false, "Do not track warnings"));
     options.addOption(new Option(null, "no-warnings", false, "Track warnings"));
+    options.addOption(new Option("h", "help", false, "Command help"));
 
 
     VerifierOptions verifierOpts = null;
@@ -90,12 +91,12 @@ public class RecogVerifier {
       // parse the command line arguments
       CommandLine line = parser.parse(options, args);
 
-      if (line.getArgs().length == 0) {
+      if (line.hasOption("help")) {
+        usage(options);
+        System.exit(1);
+      } else if (line.getArgs().length == 0) {
         System.err.println("Missing XML fingerprint files");
-        // generate the help statement
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("recog_verify [options] XML_FINGERPRINT_FILE1 ...",
-                "Verifies that each fingerprint passes its internal tests.", options, null);
+        usage(options);
         System.exit(1);
       }
 
@@ -134,6 +135,13 @@ public class RecogVerifier {
     }
 
     System.exit(failures + warnings);
+  }
+
+  private static void usage(Options options) {
+    // generate the help statement
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("recog_verify [options] XML_FINGERPRINT_FILE1 ...",
+            "Verifies that each fingerprint passes its internal tests.", options, null);
   }
 
   private static VerifierOptions getVerifierOptions(CommandLine line) {
