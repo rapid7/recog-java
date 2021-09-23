@@ -5,8 +5,17 @@ import com.rapid7.recog.RecogMatchers;
 import com.rapid7.recog.parser.ParseException;
 import com.rapid7.recog.parser.RecogParser;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -111,24 +120,29 @@ public class RecogVerifier {
     int warnings = 0;
 
     for (String filePath : filePaths) {
-      File fingerprintFile = new File(filePath);
-      Collection<File> files = Collections.emptySet();
-      if (fingerprintFile.isDirectory()) {
-        files = FileUtils.listFiles(fingerprintFile, new String[]{"xml"}, true);
-      } else if (fingerprintFile.isFile()) {
-        files = Collections.singleton(fingerprintFile);
+      List<Path> globPaths = null;
+      PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:" + filePath);
+      try (Stream<Path> stream = Files.walk(FileSystems.getDefault().getPath(""))) {
+        globPaths = stream
+            .filter(Files::isRegularFile)
+            .filter(pathMatcher::matches)
+            .sorted()
+            .collect(Collectors.toList());
+      } catch (IOException exception) {
+        System.err.printf("error: processing path '%s': %s%n", filePath, exception.getMessage());
+        System.exit(-1);
       }
 
-      for (File file : files) {
+      for (Path p : globPaths) {
         try {
           RecogParser recogParser = new RecogParser(true);
-          RecogMatchers matchers = recogParser.parse(file);
+          RecogMatchers matchers = recogParser.parse(p.toFile());
           RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers);
           verifier.verify();
           failures += verifier.getReporter().getFailureCount();
           warnings += verifier.getReporter().getWarningCount();
         } catch (ParseException exception) {
-          System.err.printf("error: parsing fingerprints file '%s': %s%n", file, exception.getMessage());
+          System.err.printf("error: parsing fingerprints file '%s': %s%n", p.toFile(), exception.getMessage());
           System.exit(-1);
         }
       }
