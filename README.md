@@ -82,7 +82,7 @@ Missing features:
 
 - Matching against multi-line input strings
 - Matching against base64 encoded strings
-- Command line tools like `recog_match` and `recog_verify`
+- Command line tools like `recog_match`
 
 ## Development
 
