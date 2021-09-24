@@ -26,8 +26,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class RecogMatcher implements Serializable {
 
-  private static final String CPE_SUFFIX = ".cpe23";
-
   /**
    * Interpolate the string using the "recog interpolation syntax"
    * This syntax will take a string like "adsf {service.version} {service.family}"
@@ -217,7 +215,7 @@ public class RecogMatcher implements Serializable {
         }
       }
 
-      return interpolate(CPE_SUFFIX, values);
+      return interpolate(null, values);
     } else
       return null;
   }
