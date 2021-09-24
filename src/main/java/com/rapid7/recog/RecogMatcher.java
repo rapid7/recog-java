@@ -231,7 +231,7 @@ public class RecogMatcher implements Serializable {
     // make sure each test case passes
     for (FingerprintExample example : examples) {
       Map<String, String> result = match(example.getText());
-      if (result == null || result.isEmpty()) {
+      if (result == null) {
         consumer.accept(Status.Fail, String.format("'%s' failed to match \"%s\" with '%s'",
                 description, example.getText(), matcher.getPattern()));
         continue;
