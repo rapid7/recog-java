@@ -66,7 +66,7 @@ public class RecogMatcher implements Serializable {
                         return part.replace("{" + item.getKey() + "}", item.getValue() == null ? "-" : item.getValue());
                       },
                       (part, item) -> part);
-          match.put(entry.getKey(), result.replaceAll(":$", ""));
+          match.put(entry.getKey(), result);
         }
       }
     }
