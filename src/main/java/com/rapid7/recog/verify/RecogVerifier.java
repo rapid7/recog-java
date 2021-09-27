@@ -122,7 +122,6 @@ public class RecogVerifier {
         globPaths = stream
             .filter(Files::isRegularFile)
             .filter(pathMatcher::matches)
-            .sorted()
             .collect(Collectors.toList());
       } catch (IOException exception) {
         System.err.printf("error: processing path '%s': %s%n", filePath, exception.getMessage());
