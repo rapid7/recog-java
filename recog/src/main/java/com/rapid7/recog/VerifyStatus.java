@@ -1,7 +1,7 @@
-package com.rapid7.recog.verify;
+package com.rapid7.recog;
 
 // Verifier status
-public enum Status {
+public enum VerifyStatus {
   Warn,
   Fail,
   Success

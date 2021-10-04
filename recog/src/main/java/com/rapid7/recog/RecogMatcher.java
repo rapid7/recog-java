@@ -3,7 +3,6 @@ package com.rapid7.recog;
 import com.rapid7.recog.pattern.JavaRegexRecogPatternMatcher;
 import com.rapid7.recog.pattern.RecogPatternMatchResult;
 import com.rapid7.recog.pattern.RecogPatternMatcher;
-import com.rapid7.recog.verify.Status;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -220,22 +219,22 @@ public class RecogMatcher implements Serializable {
       return null;
   }
 
-  public void verifyExamples(BiConsumer<Status, String> consumer) {
+  public void verifyExamples(BiConsumer<VerifyStatus, String> consumer) {
     // look for the presence of test cases
     if (examples.size() == 0) {
-      consumer.accept(Status.Warn, String.format("'%s' has no test cases", description));
+      consumer.accept(VerifyStatus.Warn, String.format("'%s' has no test cases", description));
     }
 
     // make sure each test case passes
     for (FingerprintExample example : examples) {
       Map<String, String> result = match(example.getText());
       if (result == null) {
-        consumer.accept(Status.Fail, String.format("'%s' failed to match \"%s\" with '%s'",
+        consumer.accept(VerifyStatus.Fail, String.format("'%s' failed to match \"%s\" with '%s'",
                 description, example.getText(), matcher.getPattern()));
         continue;
       }
 
-      Status status = Status.Success;
+      VerifyStatus verifyStatus = VerifyStatus.Success;
       String message = example.getText();
       // Ensure that all the attributes as provided by the example were parsed
       // out correctly and match the capture group values we expect.
@@ -247,19 +246,19 @@ public class RecogMatcher implements Serializable {
         }
 
         if (!result.containsKey(key) || !result.get(key).equals(value)) {
-          status = Status.Fail;
+          verifyStatus = VerifyStatus.Fail;
           message = String.format("'%s' failed to find expected capture group %s '%s'. Result was %s",
                   description, key, value, result.get(key));
           break;
         }
       }
-      consumer.accept(status, message);
+      consumer.accept(verifyStatus, message);
     }
 
     verifyExamplesHaveCaptureGroups(consumer);
   }
 
-  private void verifyExamplesHaveCaptureGroups(BiConsumer<Status, String> consumer) {
+  private void verifyExamplesHaveCaptureGroups(BiConsumer<VerifyStatus, String> consumer) {
     Map<String, Boolean> captureGroupUsed = new HashMap<>();
     // get a list of parameters that are defined by capture groups
     for (Entry<String, Integer> parameter : positionalParameters.entrySet()) {
@@ -285,7 +284,7 @@ public class RecogMatcher implements Serializable {
       Boolean paramUsed = entry.getValue();
       if (!paramUsed) {
         String message = String.format("'%s' is missing an example that checks for parameter '%s' which is derived from a capture group", description, paramName);
-        consumer.accept(Status.Warn, message);
+        consumer.accept(VerifyStatus.Warn, message);
       }
     }
   }
