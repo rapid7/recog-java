@@ -1,6 +1,6 @@
 ## Recog Java
 
-[![Travis (.org)](https://img.shields.io/travis/rapid7/recog-java.svg)](https://travis-ci.org/rapid7/recog-java) [![Maven Central](https://img.shields.io/maven-central/v/com.rapid7.recog/recog-java.svg)](https://search.maven.org/artifact/com.rapid7.recog/recog-java) [![Javadocs](https://www.javadoc.io/badge/com.rapid7.recog/recog-java.svg)](https://www.javadoc.io/doc/com.rapid7.recog/recog-java)
+[![CI workflow](https://github.com/rapid7/recog-java/actions/workflows/ci.yml/badge.svg)](https://github.com/rapid7/recog-java/actions/workflows/ci.yml) [![Maven Central](https://img.shields.io/maven-central/v/com.rapid7.recog/recog-java.svg)](https://search.maven.org/artifact/com.rapid7.recog/recog-java) [![Javadocs](https://www.javadoc.io/badge/com.rapid7.recog/recog-java.svg)](https://www.javadoc.io/doc/com.rapid7.recog/recog-java)
 
 Java implementation of [Recog](https://github.com/rapid7/recog) that supports parsing and matching.
 
