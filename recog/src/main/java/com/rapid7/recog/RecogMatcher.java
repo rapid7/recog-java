@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static java.util.Collections.emptySet;
@@ -23,6 +24,54 @@ import static java.util.Objects.requireNonNull;
  * match. See {@link Matcher#find()} vs {@link Matcher#matches()}.
  */
 public class RecogMatcher implements Serializable {
+
+  /**
+   * Interpolate the string using the "recog interpolation syntax"
+   * This syntax will take a string like "adsf {service.version} {service.family}"
+   * and attempt to resolve "{service.version}" and "{service.family}" in the string
+   * against the parameter map. So, given these parameters:
+   *    - service.cpe23: "adsf {service.version} {service.family}"
+   *    - service.version: "1.1"
+   *    - service.family: "foo"
+   *
+   * <p>The map will resolve to:
+   *    - service.cpe23: "asdf 1.1 foo"
+   *    - service.version: "1.1"
+   *    - service.family: "foo"
+   *
+   * @param keyEndsWith A string used to filter which keys will have their
+   *     values interpolated (any key ending with this value). If {@code null},
+   *     all keys are considered.
+   * @param match The map containing values that can be interpolated. Must not
+   *     be {@code null}.
+   * @return A map containing the interpolated key/values.
+   */
+  public static Map<String, String> interpolate(String keyEndsWith, Map<String, String> match) {
+    requireNonNull(match);
+
+    for (Entry<String, String> entry : match.entrySet()) {
+      // For all keys that end with a certain extension (for optimization)...
+      if (keyEndsWith == null || entry.getKey().endsWith(keyEndsWith)) {
+        String value = entry.getValue();
+        if (value != null) {
+          // The operation below is a "fold left" -- basically iterate over
+          // all the items in the map, and attempt to replace the items in
+          // this string with those map items.
+          String result =
+              match.entrySet().stream()
+                  .reduce(
+                      entry.getValue(),
+                      (part, item) -> {
+                        return part.replace("{" + item.getKey() + "}", item.getValue() == null ? "-" : item.getValue());
+                      },
+                      (part, item) -> part);
+          match.put(entry.getKey(), result);
+        }
+      }
+    }
+
+    return match;
+  }
 
   private final RecogPatternMatcher matcher;
 
@@ -45,7 +94,7 @@ public class RecogMatcher implements Serializable {
   private String description;
 
   /** Optional examples that illustrate the matcher (or that can be used to test the matcher). */
-  private Set<String> examples;
+  private Set<FingerprintExample> examples;
 
   /**
    * Creates a new RecogMatcher using a {@link JavaRegexRecogPatternMatcher} to
@@ -98,9 +147,10 @@ public class RecogMatcher implements Serializable {
    *        {@code null}.
    * @return A reference to this matcher to allow for method chaining.
    */
-  public RecogMatcher addExample(String example) {
-    if (example != null)
+  public RecogMatcher addExample(FingerprintExample example) {
+    if (example != null) {
       examples.add(example);
+    }
 
     return this;
   }
@@ -111,7 +161,7 @@ public class RecogMatcher implements Serializable {
    *
    * @return A non-null, immutable {@link Set} of examples. May be empty.
    */
-  public Set<String> getExamples() {
+  public Set<FingerprintExample> getExamples() {
     return examples == null ? emptySet() : unmodifiableSet(examples);
   }
 
@@ -164,9 +214,79 @@ public class RecogMatcher implements Serializable {
         }
       }
 
-      return values;
+      return interpolate(null, values);
     } else
       return null;
+  }
+
+  public void verifyExamples(BiConsumer<VerifyStatus, String> consumer) {
+    // look for the presence of test cases
+    if (examples.size() == 0) {
+      consumer.accept(VerifyStatus.Warn, String.format("'%s' has no test cases", description));
+    }
+
+    // make sure each test case passes
+    for (FingerprintExample example : examples) {
+      Map<String, String> result = match(example.getText());
+      if (result == null) {
+        consumer.accept(VerifyStatus.Fail, String.format("'%s' failed to match \"%s\" with '%s'",
+                description, example.getText(), matcher.getPattern()));
+        continue;
+      }
+
+      VerifyStatus verifyStatus = VerifyStatus.Success;
+      String message = example.getText();
+      // Ensure that all the attributes as provided by the example were parsed
+      // out correctly and match the capture group values we expect.
+      for (Map.Entry<String, String> entry : example.getAttributeMap().entrySet()) {
+        String key = entry.getKey();
+        String value = entry.getValue();
+        if (key.equals("_encoding")) {
+          continue;
+        }
+
+        if (!result.containsKey(key) || !result.get(key).equals(value)) {
+          verifyStatus = VerifyStatus.Fail;
+          message = String.format("'%s' failed to find expected capture group %s '%s'. Result was %s",
+                  description, key, value, result.get(key));
+          break;
+        }
+      }
+      consumer.accept(verifyStatus, message);
+    }
+
+    verifyExamplesHaveCaptureGroups(consumer);
+  }
+
+  private void verifyExamplesHaveCaptureGroups(BiConsumer<VerifyStatus, String> consumer) {
+    Map<String, Boolean> captureGroupUsed = new HashMap<>();
+    // get a list of parameters that are defined by capture groups
+    for (Entry<String, Integer> parameter : positionalParameters.entrySet()) {
+      if (parameter.getValue() > 0 && !parameter.getKey().isEmpty()) {
+        captureGroupUsed.put(parameter.getKey(), false);
+      }
+    }
+
+    // match up the fingerprint parameters with test attributes
+    for (FingerprintExample example : examples) {
+      Map<String, String> result = match(example.getText());
+      for (Entry<String, String> entry : example.getAttributeMap().entrySet()) {
+        String key = entry.getKey();
+        if (captureGroupUsed.containsKey(key)) {
+          captureGroupUsed.replace(key, true);
+        }
+      }
+    }
+
+    // alert on untested parameters
+    for (Entry<String, Boolean> entry : captureGroupUsed.entrySet()) {
+      String paramName = entry.getKey();
+      Boolean paramUsed = entry.getValue();
+      if (!paramUsed) {
+        String message = String.format("'%s' is missing an example that checks for parameter '%s' which is derived from a capture group", description, paramName);
+        consumer.accept(VerifyStatus.Warn, message);
+      }
+    }
   }
 
   /**

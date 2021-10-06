@@ -1,5 +1,6 @@
 package com.rapid7.recog.parser;
 
+import com.rapid7.recog.FingerprintExample;
 import com.rapid7.recog.RecogMatcher;
 import com.rapid7.recog.RecogMatchers;
 import com.rapid7.recog.pattern.JavaRegexRecogPatternMatcher;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -162,8 +166,19 @@ public class RecogParser {
 
           if ("base64".equals(example.getAttribute("_encoding"))) {
             // TODO: these are currently ignored as the Base64 decoding isn't working properly
-          } else
-            fingerprintPattern.addExample(exampleContent);
+          } else {
+            HashMap<String, String> attributeMap = new HashMap<>();
+            NamedNodeMap exAttributes = example.getAttributes();
+
+            for (int i = 0; i < exAttributes.getLength(); i++) {
+              Node attr = exAttributes.item(i);
+              String attrName = attr.getNodeName();
+              String attrValue = attr.getNodeValue();
+              attributeMap.put(attrName, attrValue);
+            }
+
+            fingerprintPattern.addExample(new FingerprintExample(exampleContent, attributeMap));
+          }
         }
 
         // parse and add parameter specifications
@@ -178,9 +193,12 @@ public class RecogParser {
           if (position == 0) {
             String paramValue = getRequiredAttribute(parameter, "value");
             fingerprintPattern.addValue(paramName, paramValue);
-          }
-          // otherwise the position indicates a group match result
-          else {
+          } else {
+            // otherwise the position indicates a group match result
+            String value = parameter.getAttribute("value");
+            if (!value.isEmpty()) {
+              throw new ParseException(String.format("Attribute \"%s\" has a non-zero position but specifies a value of \"%s\"", paramName, value));
+            }
             fingerprintPattern.addParam(position, paramName);
           }
         }

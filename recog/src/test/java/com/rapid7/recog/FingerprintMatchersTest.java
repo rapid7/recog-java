@@ -217,13 +217,12 @@ public class FingerprintMatchersTest {
   @Test
   public void interpolateWithNullSuffix() {
     // given
-    RecogMatchers matchers = new RecogMatchers();
     HashMap<String, String> map = new HashMap<>();
     map.put("foo", "test");
     map.put("bar", "{foo}");
 
     // when
-    matchers.interpolate(null, map);
+    RecogMatcher.interpolate(null, map);
 
     // then
     assertThat(map.get("bar"), is("test"));
@@ -233,13 +232,12 @@ public class FingerprintMatchersTest {
   @Test
   public void interpolateWithNonNullSuffix() {
     // given
-    RecogMatchers matchers = new RecogMatchers();
     HashMap<String, String> map = new HashMap<>();
     map.put("foo", "test");
     map.put("bar", "{foo}");
 
     // when
-    matchers.interpolate("bar", map);
+    RecogMatcher.interpolate("bar", map);
 
     // then
     assertThat(map.get("bar"), is("test"));
