@@ -50,11 +50,11 @@
     <commons.cli.version>1.4</commons.cli.version>
     <slf4j.version>1.7.25</slf4j.version>
     <!-- test dependencies -->
-    <commons.io.version>2.6</commons.io.version>
-    <commons.lang3.version>3.8.1</commons.lang3.version>
-    <hamcrest.version>1.3</hamcrest.version>
-    <junit.jupiter.version>5.4.0</junit.jupiter.version>
-    <mockito.version>2.18.0</mockito.version>
+    <commons.io.version>2.11.0</commons.io.version>
+    <commons.lang3.version>3.12.0</commons.lang3.version>
+    <hamcrest.version>2.2</hamcrest.version>
+    <junit.jupiter.version>5.8.1</junit.jupiter.version>
+    <mockito.version>3.12.4</mockito.version>
   </properties>
 
   <dependencyManagement>
@@ -172,7 +172,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.2</version>
         <configuration>
           <configLocation>${maven.multiModuleProjectDirectory}/google_checks.xml</configLocation>
           <violationSeverity>warning</violationSeverity>
@@ -193,7 +193,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.18</version>
+            <version>9.0.1</version>
             <scope>compile</scope>
           </dependency>
         </dependencies>
