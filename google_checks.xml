@@ -136,13 +136,17 @@
     </module>
     <module name="JavadocMethod">
       <property name="severity" value="ignore"/>
+      <property name="allowedAnnotations" value="Override, Test"/>
+      <property name="accessModifiers" value="public"/>
+      <property name="allowMissingParamTags" value="true"/>
+      <property name="allowMissingReturnTag" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="MissingJavadocMethod">
+      <property name="severity" value="ignore"/>
       <property name="minLineCount" value="2"/>
       <property name="allowedAnnotations" value="Override, Test"/>
       <property name="scope" value="public"/>
-      <property name="allowThrowsTagsForSubclasses" value="true"/>
-      <property name="allowMissingParamTags" value="true"/>
-      <property name="allowMissingThrowsTags" value="true"/>
-      <property name="allowMissingReturnTag" value="true"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="MethodName">
