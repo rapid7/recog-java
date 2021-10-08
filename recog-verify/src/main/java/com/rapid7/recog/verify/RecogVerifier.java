@@ -157,7 +157,6 @@ public class RecogVerifier {
     VerifierOptions verifierOpts = new VerifierOptions();
 
     if (line.hasOption("format")) {
-      verifierOpts.setDetail(true);
       if (line.getOptionValue("format").startsWith("d")) {
         verifierOpts.setDetail(true);
       } else if (line.getOptionValue("format").startsWith("q")) {
