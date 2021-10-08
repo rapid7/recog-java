@@ -6,13 +6,19 @@ public class VerifyReporter {
 
   private final VerifierOptions options;
   private final Formatter formatter;
+  private final String path;
   private int successCount;
   private int warningCount;
   private int failureCount;
 
   public VerifyReporter(VerifierOptions options, Formatter formatter) {
+    this(options, formatter, null);
+  }
+
+  public VerifyReporter(VerifierOptions options, Formatter formatter, String path) {
     this.options = options;
     this.formatter = formatter;
+    this.path = path;
     resetCounts();
   }
 
@@ -51,12 +57,18 @@ public class VerifyReporter {
     }
 
     warningCount++;
-    formatter.warningMessage(String.format("%s%s", padding(), text));
+    formatter.warningMessage(String.format("%s%s%s", pathLabel(), padding(), text));
   }
 
   public void failure(String text) {
     failureCount++;
-    formatter.failureMessage(String.format("%s%s", padding(), text));
+    formatter.failureMessage(String.format("%s%s%s", pathLabel(), padding(), text));
+  }
+
+  public void printPath() {
+    if (options.isDetail() && !(path == null || path.isEmpty())) {
+      formatter.statusMessage(String.format("\n%s:", path));
+    }
   }
 
   public void printName(RecogMatcher fingerprint) {
@@ -87,6 +99,10 @@ public class VerifyReporter {
     warningCount = 0;
   }
 
+  private String pathLabel() {
+    return options.isDetail() || path == null || path.isEmpty() ? "" : String.format("%s: ", path);
+  }
+
   private String padding() {
     if (options.isDetail()) {
       return "   ";
@@ -95,8 +111,8 @@ public class VerifyReporter {
   }
 
   private String summaryLine() {
-    return String.format("SUMMARY: Test completed with %d successful, %d warnings"
-            + ", and %d failures", successCount, warningCount, failureCount);
+    return String.format("%sSUMMARY: Test completed with %d successful, %d warnings"
+            + ", and %d failures", pathLabel(), successCount, warningCount, failureCount);
   }
 
   private void colorizeSummary(String summary) {
