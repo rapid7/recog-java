@@ -133,7 +133,7 @@ public class RecogParser {
 
     String recogKey = root.getAttribute("matches");
 
-    if (recogKey.isEmpty() || recogKey == null) {
+    if (recogKey.isEmpty()) {
       LOGGER.debug("Recog Matcher Key is Empty or Null. File Name: " + name);
       recogKey = name;
     }
