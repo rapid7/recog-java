@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class RecogMatchers extends ArrayList<RecogMatcher> {
 
+  private String path;
   private String key;
   private String protocol;
   private String type;
@@ -25,10 +26,19 @@ public class RecogMatchers extends ArrayList<RecogMatcher> {
   }
 
   public RecogMatchers(String key, String protocol, String type, float preference) {
+    this(null, key, protocol, type, preference);
+  }
+
+  public RecogMatchers(String path, String key, String protocol, String type, float preference) {
+    this.path = path;
     this.key = requireNonNull(key);
     this.protocol = protocol;
     this.type = type;
     this.preference = preference;
+  }
+
+  public String getPath() {
+    return path;
   }
 
   public String getKey() {
