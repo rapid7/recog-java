@@ -92,7 +92,7 @@ public class RecogParser {
   public RecogMatchers parse(File file)
       throws ParseException {
     try (Reader reader = new FileReader(file)) {
-      return parse(reader, file.getName().replaceAll(".xml", ""));
+      return parse(reader, file.getPath(), file.getName().replaceAll(".xml", ""));
     } catch (Exception exception) {
       throw new ParseException("Failed to parse recog fingerprints from file " + file.getAbsolutePath(), exception);
     }
@@ -102,12 +102,27 @@ public class RecogParser {
    * Parses {@link RecogMatchers} from the XML content in the specified {@link Reader}.
    *
    * @param reader The content to read from. Must not be {@code null}.
-   * @param name Unused
+   * @param name Value used for {@link RecogMatchers} key if parsed value is null or empty.
    * @return {@link RecogMatchers} parsed from the reader. Will not be {@code null} but may be empty
    *         if no matchers are defined, or all matchers are invalid and strict mode is disabled.
    * @throws ParseException If an error is encountered and strict-mode is enabled.
    */
   public RecogMatchers parse(Reader reader, String name)
+      throws ParseException {
+    return parse(reader, null, name);
+  }
+
+  /**
+   * Parses {@link RecogMatchers} from the XML content in the specified {@link Reader}.
+   *
+   * @param reader The content to read from. Must not be {@code null}.
+   * @param path Optional XML content file path.
+   * @param name Value used for {@link RecogMatchers} key if parsed value is null or empty.
+   * @return {@link RecogMatchers} parsed from the reader. Will not be {@code null} but may be empty
+   *         if no matchers are defined, or all matchers are invalid and strict mode is disabled.
+   * @throws ParseException If an error is encountered and strict-mode is enabled.
+   */
+  public RecogMatchers parse(Reader reader, String path, String name)
       throws ParseException {
     Document document;
     try {
@@ -133,12 +148,12 @@ public class RecogParser {
 
     String recogKey = root.getAttribute("matches");
 
-    if (recogKey.isEmpty() || recogKey == null) {
+    if (recogKey.isEmpty()) {
       LOGGER.debug("Recog Matcher Key is Empty or Null. File Name: " + name);
       recogKey = name;
     }
 
-    RecogMatchers matchers = new RecogMatchers(recogKey, root.getAttribute("protocol"), root.getAttribute("database_type"), preference);
+    RecogMatchers matchers = new RecogMatchers(path, recogKey, root.getAttribute("protocol"), root.getAttribute("database_type"), preference);
 
     NodeList fingerprints = root.getElementsByTagName("fingerprint");
     for (int index = 0; index < fingerprints.getLength(); index++) {

@@ -33,7 +33,7 @@ public class RecogVerifier {
     requireNonNull(verifierOpts);
 
     Formatter formatter = new Formatter(verifierOpts, requireNonNull(output));
-    VerifyReporter reporter = new VerifyReporter(verifierOpts, formatter);
+    VerifyReporter reporter = new VerifyReporter(verifierOpts, formatter, matchers.getPath());
     return new RecogVerifier(requireNonNull(matchers), reporter);
   }
 
@@ -51,6 +51,7 @@ public class RecogVerifier {
   }
 
   public void verify() {
+    reporter.printPath();
     for (RecogMatcher matcher : fingerprints) {
       reporter.printName(matcher);
 
@@ -157,7 +158,6 @@ public class RecogVerifier {
     VerifierOptions verifierOpts = new VerifierOptions();
 
     if (line.hasOption("format")) {
-      verifierOpts.setDetail(true);
       if (line.getOptionValue("format").startsWith("d")) {
         verifierOpts.setDetail(true);
       } else if (line.getOptionValue("format").startsWith("q")) {
