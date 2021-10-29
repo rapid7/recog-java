@@ -6,6 +6,8 @@ import com.rapid7.recog.pattern.RecogPatternMatcher;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -114,9 +116,9 @@ public class RecogMatcher implements Serializable {
   public RecogMatcher(RecogPatternMatcher matcher) {
     this.matcher = matcher;
     values = new HashMap<>();
-    positionalParameters = new HashMap<>();
+    positionalParameters = new LinkedHashMap<>();
     namedParameters = new HashSet<>();
-    examples = new HashSet<>();
+    examples = new LinkedHashSet<>();
   }
 
   /**
@@ -259,7 +261,7 @@ public class RecogMatcher implements Serializable {
   }
 
   private void verifyExamplesHaveCaptureGroups(BiConsumer<VerifyStatus, String> consumer) {
-    Map<String, Boolean> captureGroupUsed = new HashMap<>();
+    Map<String, Boolean> captureGroupUsed = new LinkedHashMap<>();
     // get a list of parameters that are defined by capture groups
     for (Entry<String, Integer> parameter : positionalParameters.entrySet()) {
       if (parameter.getValue() > 0 && !parameter.getKey().isEmpty()) {
