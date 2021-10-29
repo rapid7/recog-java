@@ -171,7 +171,7 @@ public class RecogParser {
         // description (optional)
         NodeList description = fingerprint.getElementsByTagName("description");
         if (description.getLength() > 0)
-          fingerprintPattern.setDescription(description.item(0).getTextContent());
+          fingerprintPattern.setDescription(description.item(0).getTextContent().replaceAll("\\s+", " ").trim());
 
         // example (optional)
         NodeList examples = fingerprint.getElementsByTagName("example");
