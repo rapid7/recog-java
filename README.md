@@ -81,7 +81,6 @@ This library is not yet at a 1:1 parity with the original [rapid7/recog](https:/
 Missing features:
 
 - Matching against multi-line input strings
-- Matching against base64 encoded strings
 - Command line tools like `recog_match`
 
 ## Development
