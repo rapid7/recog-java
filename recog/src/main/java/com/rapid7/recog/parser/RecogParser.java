@@ -177,23 +177,18 @@ public class RecogParser {
         NodeList examples = fingerprint.getElementsByTagName("example");
         for (int examplesIndex = 0; examplesIndex < examples.getLength(); examplesIndex++) {
           Element example = (Element) examples.item(examplesIndex);
-          String exampleContent = example.getTextContent();
 
-          if ("base64".equals(example.getAttribute("_encoding"))) {
-            // TODO: these are currently ignored as the Base64 decoding isn't working properly
-          } else {
-            HashMap<String, String> attributeMap = new HashMap<>();
-            NamedNodeMap exAttributes = example.getAttributes();
+          HashMap<String, String> attributeMap = new HashMap<>();
+          NamedNodeMap exAttributes = example.getAttributes();
 
-            for (int i = 0; i < exAttributes.getLength(); i++) {
-              Node attr = exAttributes.item(i);
-              String attrName = attr.getNodeName();
-              String attrValue = attr.getNodeValue();
-              attributeMap.put(attrName, attrValue);
-            }
-
-            fingerprintPattern.addExample(new FingerprintExample(exampleContent, attributeMap));
+          for (int i = 0; i < exAttributes.getLength(); i++) {
+            Node attr = exAttributes.item(i);
+            String attrName = attr.getNodeName();
+            String attrValue = attr.getNodeValue();
+            attributeMap.put(attrName, attrValue);
           }
+
+          fingerprintPattern.addExample(new FingerprintExample(example.getTextContent(), attributeMap));
         }
 
         // parse and add parameter specifications
