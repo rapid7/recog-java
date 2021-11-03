@@ -229,7 +229,7 @@ public class RecogParser {
   /////////////////////////////////////////////////////////////////////////
 
   private int parseFlags(String flags) {
-    int cflags = 0;
+    int cflags = Pattern.UNIX_LINES;
     if (flags != null && flags.length() != 0) {
       StringTokenizer tok = new StringTokenizer(flags, "|,; \t");
       while (tok.hasMoreTokens()) {
@@ -239,9 +239,8 @@ public class RecogParser {
             cflags |= Pattern.CASE_INSENSITIVE;
             break;
           case "REG_DOT_NEWLINE":
-            cflags |= Pattern.DOTALL;
-            break;
           case "REG_MULTILINE":
+            cflags |= Pattern.DOTALL;
             cflags |= Pattern.MULTILINE;
             break;
           default:

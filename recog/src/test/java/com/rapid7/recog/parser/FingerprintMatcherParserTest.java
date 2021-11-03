@@ -94,7 +94,7 @@ public class FingerprintMatcherParserTest {
     assertThat(patterns.size(), is(2));
     assertThat(patterns, hasItems(
             new RecogMatcher(pattern("^Apache/\\d$", CASE_INSENSITIVE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache"),
-            new RecogMatcher(pattern("^Apache$", MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
+            new RecogMatcher(pattern("^Apache$", DOTALL, MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
   }
 
   @Test

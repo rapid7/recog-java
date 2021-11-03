@@ -350,7 +350,7 @@ public class RecogMatcher implements Serializable {
    * @return A {@link Pattern} with the compiled flags provided. Will not be {@code null}.
    */
   public static Pattern pattern(String regex, int... flags) {
-    int patternFlags = 0;
+    int patternFlags = Pattern.UNIX_LINES;
     for (int flag : flags)
       patternFlags |= flag;
 
