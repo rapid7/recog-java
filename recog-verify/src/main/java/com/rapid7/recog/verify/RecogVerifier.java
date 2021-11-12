@@ -138,7 +138,8 @@ public class RecogVerifier {
           failures += verifier.getReporter().getFailureCount();
           warnings += verifier.getReporter().getWarningCount();
         } catch (ParseException exception) {
-          System.err.printf("error: parsing fingerprints file '%s': %s%n", p.toFile(), exception.getMessage());
+          String message = exception.getCause() != null ? exception.getCause().getMessage() : exception.getMessage();
+          System.err.printf("error: parsing fingerprints file '%s': %s%n", p.toFile(), message);
           System.exit(-1);
         }
       }
