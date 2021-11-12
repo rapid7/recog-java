@@ -3,7 +3,13 @@ package com.rapid7.recog.parser;
 import com.rapid7.recog.RecogMatcher;
 import com.rapid7.recog.RecogMatchers;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import static com.rapid7.recog.RecogMatcher.pattern;
 import static com.rapid7.recog.TestGenerators.anyString;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
@@ -12,8 +18,11 @@ import static java.util.regex.Pattern.MULTILINE;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 
 public class FingerprintMatcherParserTest {
 
@@ -95,6 +104,40 @@ public class FingerprintMatcherParserTest {
     assertThat(patterns, hasItems(
             new RecogMatcher(pattern("^Apache/\\d$", CASE_INSENSITIVE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache"),
             new RecogMatcher(pattern("^Apache$", DOTALL, MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
+  }
+
+  @Test
+  public void validFingerprintExternalExampleFile() throws ParseException {
+    // given
+    int exServiceVersion = 1;
+    String exText = String.format("Apache %d", exServiceVersion);
+    String exFilename = anyString();
+    String xml = String.format("<?xml version=\"1.0\"?>\n"
+        + "<fingerprints matches=\"http_header.server\">"
+        + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
+        + "        <description>Apache returning only its major version number</description>\n"
+        + "        <example _filename=\"%s\" service.version=\"%d\"></example>\n"
+        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+        + "        <param pos=\"1\" name=\"service.version\"/>\n"
+        + "    </fingerprint>\n"
+        + "</fingerprints>", exFilename, exServiceVersion);
+
+    try (MockedStatic<Files> mockFiles = Mockito.mockStatic(Files.class)) {
+      mockFiles.when(() -> Files.readAllBytes(any(Path.class)))
+          .thenReturn(exText.getBytes(StandardCharsets.US_ASCII));
+
+      // when
+      RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+
+      // then
+      assertThat(patterns.size(), is(1));
+      assertThat(patterns, hasItems(new RecogMatcher(pattern("^Apache (\\d)$")).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache").addParam(1, "service.version")));
+      assertThat(patterns.get(0).getExamples().size(), is(1));
+      mockFiles.verify(() -> Files.readAllBytes(any(Path.class)));
+      assertThat(patterns.get(0).getExamples(), contains(hasProperty("text", is(exText))));
+    }
   }
 
   @Test
@@ -274,6 +317,33 @@ public class FingerprintMatcherParserTest {
     // when
     Exception exception = assertThrows(ParseException.class, () -> {
       new RecogParser(true).parse(new StringReader(xml), anyString());
+    }, expectedMessage);
+
+    // then
+    assertEquals(expectedMessage, exception.getMessage());
+  }
+
+  @Test
+  public void missingExternalExampleFileFailsWhenStrict() {
+    // given
+    String exFilename = anyString();
+    String xml = String.format("<?xml version=\"1.0\"?>\n"
+        + "<fingerprints matches=\"http_header.server\">"
+        + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
+        + "        <description>Apache returning only its major version number</description>\n"
+        + "        <example _filename=\"%s\"></example>\n"
+        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+        + "        <param pos=\"1\" name=\"service.version\"/>\n"
+        + "    </fingerprint>\n"
+        + "</fingerprints>", exFilename);
+    String name = anyString();
+    String expectedMessage = String.format("Unable to process fingerprint example file '%s'", Paths.get(name, exFilename));
+
+    // when
+    Exception exception = assertThrows(ParseException.class, () -> {
+      new RecogParser(true).parse(new StringReader(xml), name);
     }, expectedMessage);
 
     // then
