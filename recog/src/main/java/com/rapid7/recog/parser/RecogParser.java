@@ -177,23 +177,18 @@ public class RecogParser {
         NodeList examples = fingerprint.getElementsByTagName("example");
         for (int examplesIndex = 0; examplesIndex < examples.getLength(); examplesIndex++) {
           Element example = (Element) examples.item(examplesIndex);
-          String exampleContent = example.getTextContent();
 
-          if ("base64".equals(example.getAttribute("_encoding"))) {
-            // TODO: these are currently ignored as the Base64 decoding isn't working properly
-          } else {
-            HashMap<String, String> attributeMap = new HashMap<>();
-            NamedNodeMap exAttributes = example.getAttributes();
+          HashMap<String, String> attributeMap = new HashMap<>();
+          NamedNodeMap exAttributes = example.getAttributes();
 
-            for (int i = 0; i < exAttributes.getLength(); i++) {
-              Node attr = exAttributes.item(i);
-              String attrName = attr.getNodeName();
-              String attrValue = attr.getNodeValue();
-              attributeMap.put(attrName, attrValue);
-            }
-
-            fingerprintPattern.addExample(new FingerprintExample(exampleContent, attributeMap));
+          for (int i = 0; i < exAttributes.getLength(); i++) {
+            Node attr = exAttributes.item(i);
+            String attrName = attr.getNodeName();
+            String attrValue = attr.getNodeValue();
+            attributeMap.put(attrName, attrValue);
           }
+
+          fingerprintPattern.addExample(new FingerprintExample(example.getTextContent(), attributeMap));
         }
 
         // parse and add parameter specifications
@@ -234,7 +229,7 @@ public class RecogParser {
   /////////////////////////////////////////////////////////////////////////
 
   private int parseFlags(String flags) {
-    int cflags = 0;
+    int cflags = Pattern.UNIX_LINES;
     if (flags != null && flags.length() != 0) {
       StringTokenizer tok = new StringTokenizer(flags, "|,; \t");
       while (tok.hasMoreTokens()) {
@@ -244,9 +239,8 @@ public class RecogParser {
             cflags |= Pattern.CASE_INSENSITIVE;
             break;
           case "REG_DOT_NEWLINE":
-            cflags |= Pattern.DOTALL;
-            break;
           case "REG_MULTILINE":
+            cflags |= Pattern.DOTALL;
             cflags |= Pattern.MULTILINE;
             break;
           default:
