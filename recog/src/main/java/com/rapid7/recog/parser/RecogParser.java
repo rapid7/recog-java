@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -32,6 +36,7 @@ import org.xml.sax.SAXException;
  * halt processing.
  */
 public class RecogParser {
+  private static final String FILENAME_KEY = "_filename";
 
   /**
    * Factory used to create the underlying {@link RecogPatternMatcher} used
@@ -188,7 +193,15 @@ public class RecogParser {
             attributeMap.put(attrName, attrValue);
           }
 
-          fingerprintPattern.addExample(new FingerprintExample(example.getTextContent(), attributeMap));
+          String exampleText;
+          if (attributeMap.containsKey(FILENAME_KEY)) {
+            // process external example file
+            String filename = attributeMap.get(FILENAME_KEY);
+            exampleText = getExternalExampleText(path, name, filename);
+          } else {
+            exampleText = example.getTextContent();
+          }
+          fingerprintPattern.addExample(new FingerprintExample(exampleText, attributeMap));
         }
 
         // parse and add parameter specifications
@@ -259,5 +272,22 @@ public class RecogParser {
       throw new ParseException("Attribute \"" + name + "\" does not exist.");
 
     return value;
+  }
+
+  private String getExternalExampleText(String path, String name, String filename) throws ParseException {
+    Path examplePath;
+    if (path != null) {
+      examplePath = Paths.get(Paths.get(path).getParent().toString(), name, filename);
+    } else {
+      examplePath = Paths.get(name, filename);
+    }
+
+    byte[] exampleBytes;
+    try {
+      exampleBytes = Files.readAllBytes(examplePath);
+    } catch (IOException exception) {
+      throw new ParseException(String.format("Unable to process fingerprint example file '%s'", examplePath), exception);
+    }
+    return new String(exampleBytes, StandardCharsets.US_ASCII);
   }
 }
