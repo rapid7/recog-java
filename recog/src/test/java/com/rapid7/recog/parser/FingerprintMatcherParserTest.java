@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -20,6 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,6 +106,34 @@ public class FingerprintMatcherParserTest {
     assertThat(patterns, hasItems(
             new RecogMatcher(pattern("^Apache/\\d$", CASE_INSENSITIVE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache"),
             new RecogMatcher(pattern("^Apache$", DOTALL, MULTILINE)).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache")));
+  }
+
+  @Test
+  public void validFingerprintBase64EncodedExample() throws ParseException {
+    // given
+    int exServiceVersion = 1;
+    String exText = String.format("Apache %d", exServiceVersion);
+    String exBase64 = Base64.getEncoder().encodeToString(exText.getBytes(StandardCharsets.US_ASCII));
+    String xml = String.format("<?xml version=\"1.0\"?>\n"
+        + "<fingerprints matches=\"http_header.server\">"
+        + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
+        + "        <description>Apache returning only its major version number</description>\n"
+        + "        <example _encoding=\"base64\" service.version=\"%d\">%s</example>\n"
+        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+        + "        <param pos=\"1\" name=\"service.version\"/>\n"
+        + "    </fingerprint>\n"
+        + "</fingerprints>", exServiceVersion, exBase64);
+
+    // when
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+
+    // then
+    assertThat(patterns.size(), is(1));
+    assertThat(patterns, hasItems(new RecogMatcher(pattern("^Apache (\\d)$")).addValue("service.vendor", "Apache").addValue("service.product", "HTTPD").addValue("service.family", "Apache").addParam(1, "service.version")));
+    assertThat(patterns.get(0).getExamples().size(), is(1));
+    assertThat(patterns.get(0).getExamples(), contains(hasProperty("text", is(exText))));
   }
 
   @Test
@@ -321,6 +351,35 @@ public class FingerprintMatcherParserTest {
 
     // then
     assertEquals(expectedMessage, exception.getMessage());
+  }
+
+  @Test
+  public void invalidFingerprintBase64EncodedExampleFailsWhenStrict() {
+    // given
+    int exServiceVersion = 1;
+    String exText = String.format("Apache %d", exServiceVersion);
+    String exBase64 = Base64.getEncoder().encodeToString(exText.getBytes(StandardCharsets.US_ASCII));
+    String badExBase64 = String.format("%s!", exBase64);
+    String xml = String.format("<?xml version=\"1.0\"?>\n"
+        + "<fingerprints matches=\"http_header.server\">"
+        + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
+        + "        <description>Apache returning only its major version number</description>\n"
+        + "        <example _encoding=\"base64\" service.version=\"%d\">%s</example>\n"
+        + "        <param pos=\"0\" name=\"service.vendor\" value=\"Apache\"/>\n"
+        + "        <param pos=\"0\" name=\"service.product\" value=\"HTTPD\"/>\n"
+        + "        <param pos=\"0\" name=\"service.family\" value=\"Apache\"/>\n"
+        + "        <param pos=\"1\" name=\"service.version\"/>\n"
+        + "    </fingerprint>\n"
+        + "</fingerprints>", exServiceVersion, badExBase64);
+    String expectedMessageStart = "Input byte array has incorrect ending byte at";
+
+    // when
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      new RecogParser(true).parse(new StringReader(xml), anyString());
+    });
+
+    // then
+    assertThat(exception.getMessage(), startsWith(expectedMessageStart));
   }
 
   @Test
