@@ -243,7 +243,7 @@ public class RecogMatcher implements Serializable {
       for (Map.Entry<String, String> entry : example.getAttributeMap().entrySet()) {
         String key = entry.getKey();
         String value = entry.getValue();
-        if (key.equals("_encoding")) {
+        if (key.equals("_encoding") || key.equals("_filename")) {
           continue;
         }
 
