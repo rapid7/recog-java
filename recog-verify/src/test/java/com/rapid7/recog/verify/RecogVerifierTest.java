@@ -83,7 +83,7 @@ public class RecogVerifierTest {
     // then
     assertEquals(0, verifier.getReporter().getSuccessCount());
     assertEquals(0, verifier.getReporter().getFailureCount());
-    assertEquals(4, verifier.getReporter().getWarningCount());
+    assertEquals(1, verifier.getReporter().getWarningCount());
   }
 
   @Test
