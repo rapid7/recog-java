@@ -42,7 +42,7 @@
   </distributionManagement>
 
   <properties>
-    <r7.recog.content.version>2.3.21</r7.recog.content.version>
+    <r7.recog.content.version>2.3.22</r7.recog.content.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
