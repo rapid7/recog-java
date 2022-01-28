@@ -225,6 +225,7 @@ public class RecogMatcher implements Serializable {
     // look for the presence of test cases
     if (examples.size() == 0) {
       consumer.accept(VerifyStatus.Warn, String.format("'%s' has no test cases", description));
+      return;
     }
 
     // make sure each test case passes
