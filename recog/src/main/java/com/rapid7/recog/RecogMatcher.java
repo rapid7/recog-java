@@ -287,7 +287,7 @@ public class RecogMatcher implements Serializable {
       Boolean paramUsed = entry.getValue();
       if (!paramUsed) {
         String message = String.format("'%s' is missing an example that checks for parameter '%s' which is derived from a capture group", description, paramName);
-        consumer.accept(VerifyStatus.Warn, message);
+        consumer.accept(VerifyStatus.Fail, message);
       }
     }
   }

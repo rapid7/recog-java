@@ -87,35 +87,6 @@ public class RecogVerifierTest {
   }
 
   @Test
-  public void verifySuccessfulExampleNonZeroPositionParamsWarnCount() throws ParseException {
-    // given
-    String xml = "<?xml version=\"1.0\"?>\n"
-        + "<fingerprints matches=\"recog-verifier-test\">\n"
-        + "    <fingerprint pattern=\"^(\\w+) Server ([0-9.]+) - ([0-9]+)$\">\n"
-        + "        <description>Service Server - no examples or params</description>\n"
-        + "        <example>Media Server 7.9.3 - 1631723269</example>\n"
-        + "        <param pos=\"0\" name=\"service.vendor\" value=\"VendorName\"/>\n"
-        + "        <param pos=\"0\" name=\"service.product\" value=\"ProductName\"/>\n"
-        + "        <param pos=\"1\" name=\"service.name\"/>\n"
-        + "        <param pos=\"2\" name=\"service.version\"/>"
-        + "        <param pos=\"3\" name=\"service.version-date\"/>"
-        + "    </fingerprint>\n"
-        + "</fingerprints>";
-
-    // when
-    RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
-    VerifierOptions verifierOpts = new VerifierOptions();
-    RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
-    verifier.verify();
-
-    // then
-    assertEquals(1, verifier.getReporter().getSuccessCount());
-    assertEquals(0, verifier.getReporter().getFailureCount());
-    assertEquals(3, verifier.getReporter().getWarningCount());
-  }
-
-  @Test
   public void verifySuccessfulExample() throws ParseException {
     // given
     String xml = "<?xml version=\"1.0\"?>\n"
@@ -171,6 +142,35 @@ public class RecogVerifierTest {
     // then
     assertEquals(1, verifier.getReporter().getSuccessCount());
     assertEquals(1, verifier.getReporter().getFailureCount());
+    assertEquals(0, verifier.getReporter().getWarningCount());
+  }
+
+  @Test
+  public void verifySuccessfulExampleUntestedParamsFailCount() throws ParseException {
+    // given
+    String xml = "<?xml version=\"1.0\"?>\n"
+        + "<fingerprints matches=\"recog-verifier-test\">\n"
+        + "    <fingerprint pattern=\"^(\\w+) Server ([0-9.]+) - ([0-9]+)$\">\n"
+        + "        <description>Service Server - no examples or params</description>\n"
+        + "        <example>Media Server 7.9.3 - 1631723269</example>\n"
+        + "        <param pos=\"0\" name=\"service.vendor\" value=\"VendorName\"/>\n"
+        + "        <param pos=\"0\" name=\"service.product\" value=\"ProductName\"/>\n"
+        + "        <param pos=\"1\" name=\"service.name\"/>\n"
+        + "        <param pos=\"2\" name=\"service.version\"/>"
+        + "        <param pos=\"3\" name=\"service.version-date\"/>"
+        + "    </fingerprint>\n"
+        + "</fingerprints>";
+
+    // when
+    RecogParser recogParser = new RecogParser(true);
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    VerifierOptions verifierOpts = new VerifierOptions();
+    RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
+    verifier.verify();
+
+    // then
+    assertEquals(1, verifier.getReporter().getSuccessCount());
+    assertEquals(3, verifier.getReporter().getFailureCount());
     assertEquals(0, verifier.getReporter().getWarningCount());
   }
 
