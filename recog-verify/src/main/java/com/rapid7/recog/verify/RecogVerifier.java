@@ -59,10 +59,10 @@ public class RecogVerifier {
       matcher.verifyExamples((status, message) -> {
         switch (status) {
           case Warn:
-            reporter.warning(message);
+            reporter.warning(message, matcher.getLine());
             break;
           case Fail:
-            reporter.failure(message);
+            reporter.failure(message, matcher.getLine());
             break;
           case Success:
             reporter.success(message);
