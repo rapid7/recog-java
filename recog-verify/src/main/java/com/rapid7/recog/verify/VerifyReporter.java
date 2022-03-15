@@ -57,12 +57,12 @@ public class VerifyReporter {
     }
 
     warningCount++;
-    formatter.warningMessage(String.format("%s%s%s", pathLabel(), padding(), text));
+    formatter.warningMessage(String.format("%s%sWARN: %s", pathLabel(), padding(), text));
   }
 
   public void failure(String text) {
     failureCount++;
-    formatter.failureMessage(String.format("%s%s%s", pathLabel(), padding(), text));
+    formatter.failureMessage(String.format("%s%sFAIL: %s", pathLabel(), padding(), text));
   }
 
   public void printPath() {
