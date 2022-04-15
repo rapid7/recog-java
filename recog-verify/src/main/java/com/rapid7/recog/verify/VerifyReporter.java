@@ -51,18 +51,18 @@ public class VerifyReporter {
     }
   }
 
-  public void warning(String text) {
+  public void warning(String text, int line) {
     if (!options.isWarnings()) {
       return;
     }
 
     warningCount++;
-    formatter.warningMessage(String.format("%s%s%s", pathLabel(), padding(), text));
+    formatter.warningMessage(String.format("%s%sWARN: %s", pathLabel(line), padding(), text));
   }
 
-  public void failure(String text) {
+  public void failure(String text, int line) {
     failureCount++;
-    formatter.failureMessage(String.format("%s%s%s", pathLabel(), padding(), text));
+    formatter.failureMessage(String.format("%s%sFAIL: %s", pathLabel(line), padding(), text));
   }
 
   public void printPath() {
@@ -99,8 +99,9 @@ public class VerifyReporter {
     warningCount = 0;
   }
 
-  private String pathLabel() {
-    return options.isDetail() || path == null || path.isEmpty() ? "" : String.format("%s: ", path);
+  private String pathLabel(int line) {
+    String lineLabel = line > -1 ? String.format("%d:", line) : "";
+    return options.isDetail() || path == null || path.isEmpty() ? "" : String.format("%s:%s ", path, lineLabel);
   }
 
   private String padding() {
@@ -112,7 +113,7 @@ public class VerifyReporter {
 
   private String summaryLine() {
     return String.format("%sSUMMARY: Test completed with %d successful, %d warnings"
-            + ", and %d failures", pathLabel(), successCount, warningCount, failureCount);
+            + ", and %d failures", pathLabel(-1), successCount, warningCount, failureCount);
   }
 
   private void colorizeSummary(String summary) {

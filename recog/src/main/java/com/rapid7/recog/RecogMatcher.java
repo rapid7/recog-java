@@ -98,6 +98,9 @@ public class RecogMatcher implements Serializable {
   /** Optional examples that illustrate the matcher (or that can be used to test the matcher). */
   private Set<FingerprintExample> examples;
 
+  /** The matcher source data line number. */
+  private int line;
+
   /**
    * Creates a new RecogMatcher using a {@link JavaRegexRecogPatternMatcher} to
    * match fingerprint values.
@@ -119,6 +122,7 @@ public class RecogMatcher implements Serializable {
     positionalParameters = new LinkedHashMap<>();
     namedParameters = new HashSet<>();
     examples = new LinkedHashSet<>();
+    line = -1;
   }
 
   /**
@@ -140,6 +144,14 @@ public class RecogMatcher implements Serializable {
    */
   public String getDescription() {
     return description;
+  }
+
+  public int getLine() {
+    return line;
+  }
+
+  public void setLine(int line) {
+    this.line = line;
   }
 
   /**
