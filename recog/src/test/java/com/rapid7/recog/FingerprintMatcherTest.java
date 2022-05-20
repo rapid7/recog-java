@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import static com.rapid7.recog.RecogMatcher.pattern;
-import static com.rapid7.recog.TestGenerators.anyString;
+import static com.rapid7.recog.TestGenerators.anyUTF8String;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
@@ -25,12 +25,12 @@ public class FingerprintMatcherTest {
 
   @Test
   public void valueNameMustNotBeNull() {
-    assertThrows(NullPointerException.class, () -> new RecogMatcher(anyPattern()).addValue(null, anyString()));
+    assertThrows(NullPointerException.class, () -> new RecogMatcher(anyPattern()).addValue(null, anyUTF8String()));
   }
 
   @Test
   public void parameterPositionMustBeGreaterThanZero() {
-    assertThrows(IllegalArgumentException.class, () -> new RecogMatcher(anyPattern()).addParam(nextInt(Integer.MIN_VALUE, 0), anyString()));
+    assertThrows(IllegalArgumentException.class, () -> new RecogMatcher(anyPattern()).addParam(nextInt(Integer.MIN_VALUE, 0), anyUTF8String()));
   }
 
   @Test

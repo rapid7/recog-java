@@ -6,7 +6,7 @@ import com.rapid7.recog.parser.RecogParser;
 import java.io.StringReader;
 import org.apache.commons.io.output.NullOutputStream;
 import org.junit.jupiter.api.Test;
-import static com.rapid7.recog.TestGenerators.anyString;
+import static com.rapid7.recog.TestGenerators.anyUTF8String;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RecogVerifierTest {
@@ -22,7 +22,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -47,7 +47,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -75,7 +75,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -104,7 +104,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -134,7 +134,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -163,7 +163,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
@@ -193,7 +193,7 @@ public class RecogVerifierTest {
 
     // when
     RecogParser recogParser = new RecogParser(true);
-    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyString());
+    RecogMatchers matchers = recogParser.parse(new StringReader(xml), anyUTF8String());
     VerifierOptions verifierOpts = new VerifierOptions();
     RecogVerifier verifier = RecogVerifier.create(verifierOpts, matchers, NullOutputStream.NULL_OUTPUT_STREAM);
     verifier.verify();
