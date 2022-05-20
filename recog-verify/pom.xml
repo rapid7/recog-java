@@ -16,6 +16,10 @@
     <version>0.8.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <maven.deploy.skip>false</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.rapid7.recog</groupId>
