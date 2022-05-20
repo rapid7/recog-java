@@ -5,7 +5,7 @@ import com.rapid7.recog.RecogMatchers;
 import com.rapid7.recog.RecogType;
 import org.junit.jupiter.api.Test;
 import static com.rapid7.recog.TestGenerators.anyEnum;
-import static com.rapid7.recog.TestGenerators.anyString;
+import static com.rapid7.recog.TestGenerators.anyUTF8String;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,7 +18,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersNoProviders() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     CompositeRecogMatchersProvider provider = new CompositeRecogMatchersProvider();
 
@@ -32,7 +32,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersSingleProviderNoMatch() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider = mock(IRecogMatchersProvider.class);
     given(provider.getMatchers(name, type)).willReturn(null);
@@ -48,7 +48,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersSingleProviderMatch() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider = mock(IRecogMatchersProvider.class);
     RecogMatchers result = mock(RecogMatchers.class);
@@ -65,7 +65,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersMultipleProviderNoMatch() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider1 = mock(IRecogMatchersProvider.class);
     IRecogMatchersProvider provider2 = mock(IRecogMatchersProvider.class);
@@ -85,7 +85,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersMultipleProviderSingleMatchFirst() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider1 = mock(IRecogMatchersProvider.class);
     IRecogMatchersProvider provider2 = mock(IRecogMatchersProvider.class);
@@ -106,7 +106,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersMultipleProviderSingleMatchLast() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider1 = mock(IRecogMatchersProvider.class);
     IRecogMatchersProvider provider2 = mock(IRecogMatchersProvider.class);
@@ -127,7 +127,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersMultipleProviderMultipleMatchesFirstIsReturned() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider1 = mock(IRecogMatchersProvider.class);
     IRecogMatchersProvider provider2 = mock(IRecogMatchersProvider.class);
@@ -156,7 +156,7 @@ public class CompositeFingerprintMatchersProviderTest {
   @Test
   public void getMatchersMultipleProviderMultipleMatchesFirstIsReturnedWhenNotFirst() {
     // given
-    String name = anyString();
+    String name = anyUTF8String();
     RecogType type = anyEnum(RecogType.class);
     IRecogMatchersProvider provider1 = mock(IRecogMatchersProvider.class);
     IRecogMatchersProvider provider2 = mock(IRecogMatchersProvider.class);

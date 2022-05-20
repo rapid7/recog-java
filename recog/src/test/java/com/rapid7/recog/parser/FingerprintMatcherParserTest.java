@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import static com.rapid7.recog.RecogMatcher.pattern;
-import static com.rapid7.recog.TestGenerators.anyString;
+import static com.rapid7.recog.TestGenerators.anyUTF8String;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.DOTALL;
 import static java.util.regex.Pattern.MULTILINE;
@@ -34,7 +34,7 @@ public class FingerprintMatcherParserTest {
     String xml = "<?xml version=\"1.0\"?><fingerprints/>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(0));
@@ -46,7 +46,7 @@ public class FingerprintMatcherParserTest {
     String xml = "<?xml version=\"1.0\"?>foo";
 
     // when
-    assertThrows(ParseException.class, () -> new RecogParser().parse(new StringReader(xml), anyString()));
+    assertThrows(ParseException.class, () -> new RecogParser().parse(new StringReader(xml), anyUTF8String()));
 
     // then - throws exception
   }
@@ -68,7 +68,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(1));
@@ -99,7 +99,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(2));
@@ -127,7 +127,7 @@ public class FingerprintMatcherParserTest {
         + "</fingerprints>", exServiceVersion, exBase64);
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(1));
@@ -141,7 +141,7 @@ public class FingerprintMatcherParserTest {
     // given
     int exServiceVersion = 1;
     String exText = String.format("Apache %d", exServiceVersion);
-    String exFilename = anyString();
+    String exFilename = anyUTF8String();
     String xml = String.format("<?xml version=\"1.0\"?>\n"
         + "<fingerprints matches=\"http_header.server\">"
         + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
@@ -159,7 +159,7 @@ public class FingerprintMatcherParserTest {
           .thenReturn(exText.getBytes(StandardCharsets.US_ASCII));
 
       // when
-      RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+      RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
       // then
       assertThat(patterns.size(), is(1));
@@ -199,7 +199,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(2));
@@ -222,7 +222,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(0));
@@ -245,7 +245,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(0));
@@ -268,7 +268,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(1));
@@ -292,7 +292,7 @@ public class FingerprintMatcherParserTest {
             + "</fingerprints>";
 
     // when
-    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyString());
+    RecogMatchers patterns = new RecogParser().parse(new StringReader(xml), anyUTF8String());
 
     // then
     assertThat(patterns.size(), is(1));
@@ -318,7 +318,7 @@ public class FingerprintMatcherParserTest {
 
     // when
     Exception exception = assertThrows(ParseException.class, () -> {
-      new RecogParser(true).parse(new StringReader(xml), anyString());
+      new RecogParser(true).parse(new StringReader(xml), anyUTF8String());
     }, expectedMessage);
 
     // then
@@ -346,7 +346,7 @@ public class FingerprintMatcherParserTest {
 
     // when
     Exception exception = assertThrows(ParseException.class, () -> {
-      new RecogParser(true).parse(new StringReader(xml), anyString());
+      new RecogParser(true).parse(new StringReader(xml), anyUTF8String());
     }, expectedMessage);
 
     // then
@@ -375,7 +375,7 @@ public class FingerprintMatcherParserTest {
 
     // when
     Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      new RecogParser(true).parse(new StringReader(xml), anyString());
+      new RecogParser(true).parse(new StringReader(xml), anyUTF8String());
     });
 
     // then
@@ -385,7 +385,7 @@ public class FingerprintMatcherParserTest {
   @Test
   public void missingExternalExampleFileFailsWhenStrict() {
     // given
-    String exFilename = anyString();
+    String exFilename = anyUTF8String();
     String xml = String.format("<?xml version=\"1.0\"?>\n"
         + "<fingerprints matches=\"http_header.server\">"
         + "    <fingerprint pattern=\"^Apache (\\d)$\">\n"
@@ -397,7 +397,7 @@ public class FingerprintMatcherParserTest {
         + "        <param pos=\"1\" name=\"service.version\"/>\n"
         + "    </fingerprint>\n"
         + "</fingerprints>", exFilename);
-    String name = anyString();
+    String name = anyUTF8String();
     String expectedMessage = String.format("Unable to process fingerprint example file '%s'", Paths.get(name, exFilename));
 
     // when

@@ -7,8 +7,11 @@ public class TestGenerators {
   
   private static Random random = new Random();
 
-  public static String anyString() {
-    return RandomStringUtils.random(16);
+  public static String anyUTF8String() {
+    return anyUTF8String(16);
+  }
+  public static String anyUTF8String(int length) {
+    return RandomStringUtils.random(length, 0, 0x10ffff, true, true);
   }
 
   public static <E extends Enum<E>> E anyEnum(Class<E> enumType) {

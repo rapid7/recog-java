@@ -5,7 +5,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import static com.rapid7.recog.RecogMatcher.pattern;
-import static com.rapid7.recog.TestGenerators.anyString;
+import static com.rapid7.recog.TestGenerators.anyUTF8String;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -31,7 +31,7 @@ public class FingerprintMatchersTest {
   @Test
   public void matchesNoMatchers() {
     // given
-    String fingerprint = anyString();
+    String fingerprint = anyUTF8String();
     RecogMatchers matchers = new RecogMatchers();
 
     // when
@@ -44,7 +44,7 @@ public class FingerprintMatchersTest {
   @Test
   public void matchesNoMatches() {
     // given
-    String fingerprint = anyString();
+    String fingerprint = anyUTF8String();
     RecogMatchers matchers = new RecogMatchers();
     matchers.add(new RecogMatcher(pattern("foo")));
     matchers.add(new RecogMatcher(pattern("bar")));
