@@ -4,7 +4,7 @@
 
   <groupId>com.rapid7.recog</groupId>
   <artifactId>build-tools</artifactId>
-  <version>0.8.0</version>
+  <version>0.8.1-SNAPSHOT</version>
   <description>Maven plugins build tools</description>
 
   <properties>
