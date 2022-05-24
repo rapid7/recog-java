@@ -4,14 +4,14 @@
 
   <groupId>com.rapid7.recog</groupId>
   <artifactId>recog-parent</artifactId>
-  <version>0.8.0-SNAPSHOT</version>
+  <version>0.8.0</version>
   <packaging>pom</packaging>
 
   <scm>
     <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
     <developerConnection>scm:git:git@github.com:rapid7/recog-java.git</developerConnection>
     <url>https://github.com/rapid7/recog-java</url>
-    <tag>HEAD</tag>
+    <tag>recog-parent-0.8.0</tag>
   </scm>
 
   <developers>
@@ -195,7 +195,7 @@
           <dependency>
             <groupId>com.rapid7.recog</groupId>
             <artifactId>build-tools</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
+            <version>0.8.0</version>
           </dependency>
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
