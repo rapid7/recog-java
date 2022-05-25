@@ -6,6 +6,9 @@
   <artifactId>recog-parent</artifactId>
   <version>0.8.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>Recog Parent</name>
+  <url>https://github.com/rapid7/recog-java</url>
+  <description>Java implementation of Recog that supports parsing and matching.</description>
 
   <scm>
     <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
