@@ -6,7 +6,7 @@
   <artifactId>recog-verify</artifactId>
   <packaging>jar</packaging>
   <name>recog-verify</name>
-  <url>https://www.rapid7.com</url>
+  <url>https://github.com/rapid7/recog-java</url>
   <description>Java implementation of Recog fingerprint verification tool.</description>
 
   <parent>

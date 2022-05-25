@@ -6,7 +6,7 @@
   <artifactId>recog-java</artifactId>
   <packaging>jar</packaging>
   <name>recog-java</name>
-  <url>https://www.rapid7.com</url>
+  <url>https://github.com/rapid7/recog-java</url>
   <description>Java implementation of Recog that supports parsing and matching.</description>
 
   <parent>

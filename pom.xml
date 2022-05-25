@@ -6,6 +6,9 @@
   <artifactId>recog-parent</artifactId>
   <version>0.8.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>Recog Parent</name>
+  <url>https://github.com/rapid7/recog-java</url>
+  <description>Java implementation of Recog that supports parsing and matching.</description>
 
   <scm>
     <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
@@ -18,6 +21,11 @@
     <developer>
       <name>Gavin Schneider</name>
       <email>gavin_schneider@rapid7.com</email>
+      <url>https://www.rapid7.com</url>
+    </developer>
+    <developer>
+      <name>Matthew Kienow</name>
+      <email>matthew_kienow@rapid7.com</email>
       <url>https://www.rapid7.com</url>
     </developer>
   </developers>
@@ -45,8 +53,6 @@
     <r7.recog.content.version>2.3.23</r7.recog.content.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <!-- Skip deploy of recog-parent -->
-    <maven.deploy.skip>true</maven.deploy.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- third party dependencies -->
     <commons.cli.version>1.4</commons.cli.version>
