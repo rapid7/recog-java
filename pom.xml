@@ -23,6 +23,11 @@
       <email>gavin_schneider@rapid7.com</email>
       <url>https://www.rapid7.com</url>
     </developer>
+    <developer>
+      <name>Matthew Kienow</name>
+      <email>matthew_kienow@rapid7.com</email>
+      <url>https://www.rapid7.com</url>
+    </developer>
   </developers>
 
   <licenses>
