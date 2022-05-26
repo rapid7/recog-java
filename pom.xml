@@ -14,7 +14,7 @@
     <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
     <developerConnection>scm:git:git@github.com:rapid7/recog-java.git</developerConnection>
     <url>https://github.com/rapid7/recog-java</url>
-    <tag>recog-parent-0.8.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
