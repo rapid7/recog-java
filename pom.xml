@@ -4,7 +4,7 @@
 
   <groupId>com.rapid7.recog</groupId>
   <artifactId>recog-parent</artifactId>
-  <version>0.8.1</version>
+  <version>0.8.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Recog Parent</name>
   <url>https://github.com/rapid7/recog-java</url>
