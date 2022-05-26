@@ -12,7 +12,7 @@
   <parent>
     <groupId>com.rapid7.recog</groupId>
     <artifactId>recog-parent</artifactId>
-    <version>0.8.2-SNAPSHOT</version>
+    <version>0.8.2</version>
   </parent>
 
   <properties>
