@@ -106,7 +106,7 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
    */
   private void parseFromWalkablePath(Path path) {
     final PathMatcher filter = path.getFileSystem().getPathMatcher("glob:**/*.xml");
-    try (Stream<Path> files = Files.list(path)) {
+    try (Stream<Path> files = Files.walk(path)) {
       files.filter(filter::matches).forEach(file -> {
         try {
           final String fileName = file.getFileName().toString();
