@@ -110,15 +110,33 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <target>
+                <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
                 <mkdir dir="${project.build.directory}/recog" />
-                <get src="http://production.cf.rubygems.org/gems/recog-${r7.recog.content.version}.gem" dest="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" usetimestamp="true" />
-                <untar src="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" dest="${project.build.directory}/recog" />
-                <untar compression="gzip" src="${project.build.directory}/recog/data.tar.gz" dest="${project.build.directory}/test-classes/com/rapid7/recog/fingerprints">
+                <get dest="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar" src="http://production.cf.rubygems.org/gems/recog-${r7.recog.content.version}.gem" usetimestamp="true"/>
+
+                <!-- Extract the recog gem archive. -->
+                <untar dest="${project.build.directory}/recog" src="${project.build.directory}/recog/recog-${r7.recog.content.version}.tar"/>
+
+                <!-- Get the appropriate fingerprint data glob based on the recog version. -->
+                <propertyregex property="recog.version.major"
+                               input="${r7.recog.content.version}"
+                               regexp="^(\d+)\.(\d+)\.(\d+).*$"
+                               select="\1"/>
+                <condition property="fingerprint-data-glob" value="xml/*.xml" else="recog/xml/*.xml">
+                  <or>
+                    <equals arg1="${recog.version.major}" arg2="2"/>
+                    <equals arg1="${recog.version.major}" arg2="1"/>
+                  </or>
+                </condition>
+
+                <!-- Extract the XML data from recog. -->
+                <untar compression="gzip" dest="${project.build.directory}/test-classes/com/rapid7/recog/fingerprints" src="${project.build.directory}/recog/data.tar.gz">
                   <patternset>
-                    <include name="xml/*.xml" />
+                    <include name="${fingerprint-data-glob}"/>
                   </patternset>
-                  <mapper type="flatten" />
+                  <mapper type="flatten"/>
                 </untar>
+
               </target>
             </configuration>
             <goals>
@@ -126,6 +144,19 @@
             </goals>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
