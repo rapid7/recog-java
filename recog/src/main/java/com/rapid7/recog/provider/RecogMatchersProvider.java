@@ -113,8 +113,12 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
           try (Reader reader = Files.newBufferedReader(file)) {
             int extIndex = fileName.lastIndexOf(".xml");
             RecogMatchers matchers = parser.parse(reader, extIndex > 0 ? fileName.substring(0, extIndex) : fileName);
-            matchersByFileName.put(fileName, matchers);
-            matchersByKey.put(matchers.getKey(), matchers);
+            if (null != matchers) {
+              matchersByFileName.put(fileName, matchers);
+              matchersByKey.put(matchers.getKey(), matchers);
+            } else {
+              LOGGER.warn("Failed to parse file {}. Not adding to matchers.", file);
+            }
           }
         } catch (IOException | ParseException exception) {
           LOGGER.warn("Failed to parse document {}.", file, exception);
