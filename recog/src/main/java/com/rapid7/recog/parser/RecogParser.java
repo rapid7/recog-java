@@ -105,11 +105,7 @@ public class RecogParser {
    */
   public RecogMatchers parse(Reader reader, String name)
       throws ParseException {
-    RecogMatchers matchers = parse(reader, null, name);
-    if (matchers == null) {
-      throw new ParseException("Failed to parse file: " + name);
-    }
-    return matchers;
+    return parse(reader, null, name);
   }
 
   /**
@@ -141,6 +137,9 @@ public class RecogParser {
       System.out.printf("parse(): exception.getMessage(): %s\n", exception.getMessage());
 
       throw new ParseException("Unable to parse fingerprints from Document", exception);
+    }
+    if (matchers == null) {
+      throw new ParseException("Failed to parse file: " + name);
     }
     return matchers;
   }
