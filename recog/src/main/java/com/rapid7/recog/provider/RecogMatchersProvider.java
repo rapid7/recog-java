@@ -109,12 +109,16 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
     try (Stream<Path> files = Files.walk(path)) {
       files.filter(filter::matches).forEach(file -> {
         try {
-          final String fileName = file.getFileName().toString();
-          try (Reader reader = Files.newBufferedReader(file)) {
-            int extIndex = fileName.lastIndexOf(".xml");
-            RecogMatchers matchers = parser.parse(reader, extIndex > 0 ? fileName.substring(0, extIndex) : fileName);
-            matchersByFileName.put(fileName, matchers);
-            matchersByKey.put(matchers.getKey(), matchers);
+          final Path filePath = file.getFileName();
+          if (filePath != null)
+          {
+            final String fileName = filePath.toString();
+            try (Reader reader = Files.newBufferedReader(file)) {
+              int extIndex = fileName.lastIndexOf(".xml");
+              RecogMatchers matchers = parser.parse(reader, extIndex > 0 ? fileName.substring(0, extIndex) : fileName);
+              matchersByFileName.put(fileName, matchers);
+              matchersByKey.put(matchers.getKey(), matchers);
+            }
           }
         } catch (IOException | ParseException exception) {
           LOGGER.warn("Failed to parse document {}.", file, exception);
