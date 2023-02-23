@@ -110,8 +110,7 @@ public class RecogMatchersProvider implements IRecogMatchersProvider, Serializab
       files.filter(filter::matches).forEach(file -> {
         try {
           final Path filePath = file.getFileName();
-          if (filePath != null)
-          {
+          if (filePath != null) {
             final String fileName = filePath.toString();
             try (Reader reader = Files.newBufferedReader(file)) {
               int extIndex = fileName.lastIndexOf(".xml");
