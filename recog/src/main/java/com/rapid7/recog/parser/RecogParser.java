@@ -138,6 +138,9 @@ public class RecogParser {
 
       throw new ParseException("Unable to parse fingerprints from Document", exception);
     }
+    if (matchers == null) {
+      throw new ParseException("Failed to parse file: " + name);
+    }
     return matchers;
   }
 }
