@@ -105,7 +105,11 @@ public class RecogParser {
    */
   public RecogMatchers parse(Reader reader, String name)
       throws ParseException {
-    return parse(reader, null, name);
+    RecogMatchers matchers = parse(reader, null, name);
+    if (matchers == null) {
+      throw new ParseException("Failed to parse file: " + name);
+    }
+    return matchers;
   }
 
   /**
