@@ -1,0 +1,16 @@
+---
+info:
+  title: Recog Java
+  description: Recog java
+  x-cortex-git:
+    github:
+      alias: r7org
+      repository: rapid7/recog-java
+  x-cortex-tag: recog-java
+  x-cortex-type: service
+  x-cortex-groups: []
+  x-cortex-domain-parents:
+  - tag: vm-asset-assessment
+openapi: 3.0.1
+servers:
+- url: "/"
