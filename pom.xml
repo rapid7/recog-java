@@ -11,8 +11,8 @@
   <description>Java implementation of Recog that supports parsing and matching.</description>
 
   <scm>
-    <connection>scm:git:git@github.com:rapid7/recog-java.git</connection>
-    <developerConnection>scm:git:git@github.com:rapid7/recog-java.git</developerConnection>
+    <connection>scm:git:https://github.com/rapid7/recog-java.git</connection>
+    <developerConnection>scm:git:https://github.com/rapid7/recog-java.git</developerConnection>
     <url>https://github.com/rapid7/recog-java</url>
     <tag>HEAD</tag>
   </scm>
@@ -268,7 +268,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -278,6 +278,13 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <!-- Prevent gpg from using pinentry programs -->
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </plugin>
         </plugins>
       </build>
