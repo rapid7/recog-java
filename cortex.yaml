@@ -1,16 +1,17 @@
----
+openapi: 3.0.1
 info:
   title: Recog Java
-  description: Recog java
+  description: Recog Java
   x-cortex-git:
     github:
       alias: r7org
       repository: rapid7/recog-java
   x-cortex-tag: recog-java
   x-cortex-type: service
-  x-cortex-groups: []
   x-cortex-domain-parents:
-  - tag: vm-asset-assessment
-openapi: 3.0.1
-servers:
-- url: "/"
+  - tag: insightvm
+  x-cortex-groups:
+   - target:on-premise
+   - strategy:on-prem
+   - criticality:critical
+   - exposure:opensource
