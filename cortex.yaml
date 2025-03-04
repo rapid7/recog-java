@@ -9,7 +9,7 @@ info:
   x-cortex-tag: recog-java
   x-cortex-type: service
   x-cortex-domain-parents:
-  - tag: insightvm
+  - tag: vm-asset-assessment
   x-cortex-groups:
    - target:on-premise
    - strategy:on-prem
