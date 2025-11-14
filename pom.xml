@@ -58,7 +58,7 @@
     <commons.cli.version>1.4</commons.cli.version>
     <slf4j.version>1.7.25</slf4j.version>
     <!-- test dependencies -->
-    <commons.io.version>2.11.0</commons.io.version>
+    <commons.io.version>2.14.0</commons.io.version>
     <commons.lang3.version>3.12.0</commons.lang3.version>
     <hamcrest.version>2.2</hamcrest.version>
     <junit.jupiter.version>5.8.1</junit.jupiter.version>
